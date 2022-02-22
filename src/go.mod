@@ -1,3 +1,3 @@
 //module gensin-server/server/src
-module server
+module gensin-server
 go 1.16
