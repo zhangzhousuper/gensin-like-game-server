@@ -24,8 +24,14 @@ func (self *Player) RecvSetIcon(iconId int) {
 	self.ModPlayer.SetIcon(iconId, self)
 }
 
-// 对外接口
 func (self *Player) RecvSetCard(cardId int) {
-	//Recv* 与客户端打交道的函数
 	self.ModPlayer.SetCard(cardId, self)
+}
+
+func (self *Player) RecvSetName(name string) {
+	self.ModPlayer.SetName(name, self)
+}
+
+func (self *Player) RecvSetSign(sign string) {
+	self.ModPlayer.SetSign(sign, self)
 }

@@ -22,11 +22,9 @@ func main() {
 
 	player := game.NewTestPlayer()
 
-	player.RecvSetIcon(1) // 胡桃
-	player.RecvSetIcon(2) // 温蒂
-	player.RecvSetIcon(3) //钟离
+	player.RecvSetName("好人")
+	player.RecvSetName("坏人")
+	player.RecvSetName("求外挂")
+	player.RecvSetName("感觉不如原神画质")
 
-	player.RecvSetCard(11) // 胡桃
-	player.RecvSetCard(22) // 温蒂
-	player.RecvSetCard(33) //钟离
 }

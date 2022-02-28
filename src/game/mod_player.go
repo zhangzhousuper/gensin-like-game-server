@@ -42,3 +42,21 @@ func (self *ModPlayer) SetCard(cardId int, player *Player) {
 	player.ModPlayer.Card = cardId
 	fmt.Println("当前名片:", player.ModPlayer.Card)
 }
+
+func (self *ModPlayer) SetName(name string, player *Player) {
+	// 调用一个HTTP地址接口判断违禁字(不好)
+	if GetManageBanWord().IsBanWord(name) {
+		return
+	}
+
+	player.ModPlayer.Name = name
+	fmt.Println("当前名字:", player.ModPlayer.Name)
+}
+
+func (self *ModPlayer) SetSign(sign string, player *Player) {
+	if GetManageBanWord().IsBanWord(sign) {
+		return
+	}
+	player.ModPlayer.Sign = sign
+	fmt.Println("当前签名:", player.ModPlayer.Sign)
+}
