@@ -1,6 +1,9 @@
 package game
 
-import "fmt"
+import (
+	"fmt"
+	"gensin-server/csvs"
+)
 
 type ModPlayer struct {
 	UserId         int
@@ -59,4 +62,26 @@ func (self *ModPlayer) SetSign(sign string, player *Player) {
 	}
 	player.ModPlayer.Sign = sign
 	fmt.Println("当前签名:", player.ModPlayer.Sign)
+}
+
+func (self *ModPlayer) AddExp(exp int) {
+	self.PlayerExp += exp
+	for {
+		config := csvs.GetNowLevelConfig(self.PlayerLevel)
+		if config == nil {
+			break
+		}
+		if config.PlayerExp == 0 {
+			break
+		}
+		//是否完成任务
+
+		if self.PlayerExp >= config.PlayerExp {
+			self.PlayerLevel += 1
+			self.PlayerExp -= config.PlayerExp
+		} else {
+			break
+		}
+	}
+	fmt.Println("当前等级:", self.PlayerLevel, "---当前经验：", self.PlayerExp)
 }

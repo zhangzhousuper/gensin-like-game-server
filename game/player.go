@@ -14,6 +14,7 @@ func NewTestPlayer() *Player {
 	player.ModCard = new(ModCard)
 	// -----------------------------
 	//数据的初始化
+	player.ModPlayer.PlayerLevel = 1
 
 	return player
 }

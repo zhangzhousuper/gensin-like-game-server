@@ -27,17 +27,13 @@ func main() {
 
 	go game.GetManageBanWord().Run()
 
-	player := game.NewTestPlayer()
+	playerGM := game.NewTestPlayer()
 
 	ticker := time.NewTicker(time.Second * 1)
 	for {
 		select {
 		case <-ticker.C:
-			if time.Now().Unix()%3 == 0 {
-				player.RecvSetName("专业代练")
-			} else if time.Now().Unix()%5 == 0 {
-				player.RecvSetName("正常玩家")
-			}
+			playerGM.ModPlayer.AddExp(5000)
 		}
 	}
 
