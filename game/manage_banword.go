@@ -3,6 +3,7 @@ package game
 import (
 	"fmt"
 	"regexp"
+	"time"
 )
 
 var manageBanWord *ManageBanWord
@@ -38,4 +39,19 @@ func (self *ManageBanWord) IsBanWord(txt string) bool {
 		}
 	}
 	return false
+}
+
+func (self *ManageBanWord) Run() bool {
+	ticker := time.NewTicker((time.Second * 1))
+	for {
+
+		select {
+		case <-ticker.C:
+			if time.Now().Unix()%10 == 0 {
+				fmt.Println("更新词库")
+			} else {
+				fmt.Println("待机")
+			}
+		}
+	}
 }

@@ -18,13 +18,9 @@ func main() {
 	// 7 生日
 	// 8 展示阵容 展示名片
 
+	// 加载配置
 	fmt.Printf("数据测试 ----start\n")
 
-	player := game.NewTestPlayer()
-
-	player.RecvSetName("好人")
-	player.RecvSetName("坏人")
-	player.RecvSetName("求外挂")
-	player.RecvSetName("感觉不如原神画质")
+	go game.GetManageBanWord().Run()
 
 }
