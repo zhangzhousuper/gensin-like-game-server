@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"gensin-server/csvs"
 	"gensin-server/game"
+	"time"
 )
 
 func main() {
@@ -19,8 +21,24 @@ func main() {
 	// 8 展示阵容 展示名片
 
 	// 加载配置
+	csvs.CheckLoadCsv()
+
 	fmt.Printf("数据测试 ----start\n")
 
 	go game.GetManageBanWord().Run()
+
+	player := game.NewTestPlayer()
+
+	ticker := time.NewTicker(time.Second * 1)
+	for {
+		select {
+		case <-ticker.C:
+			if time.Now().Unix()%3 == 0 {
+				player.RecvSetName("专业代练")
+			} else if time.Now().Unix()%5 == 0 {
+				player.RecvSetName("正常玩家")
+			}
+		}
+	}
 
 }

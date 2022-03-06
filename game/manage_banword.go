@@ -2,6 +2,7 @@ package game
 
 import (
 	"fmt"
+	"gensin-server/csvs"
 	"regexp"
 	"time"
 )
@@ -42,15 +43,16 @@ func (self *ManageBanWord) IsBanWord(txt string) bool {
 }
 
 func (self *ManageBanWord) Run() bool {
+	self.BanWordBase = csvs.GetBanWordBase()
+	//基础词库的更新
 	ticker := time.NewTicker((time.Second * 1))
 	for {
-
 		select {
 		case <-ticker.C:
 			if time.Now().Unix()%10 == 0 {
-				fmt.Println("更新词库")
+				//fmt.Println("更新词库")
 			} else {
-				fmt.Println("待机")
+				//fmt.Println("待机")
 			}
 		}
 	}
