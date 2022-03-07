@@ -64,7 +64,7 @@ func (self *ModPlayer) SetSign(sign string, player *Player) {
 	fmt.Println("当前签名:", player.ModPlayer.Sign)
 }
 
-func (self *ModPlayer) AddExp(exp int) {
+func (self *ModPlayer) AddExp(exp int, player *Player) {
 	self.PlayerExp += exp
 	for {
 		config := csvs.GetNowLevelConfig(self.PlayerLevel)
@@ -75,6 +75,9 @@ func (self *ModPlayer) AddExp(exp int) {
 			break
 		}
 		//是否完成任务
+		if config.ChapterId > 0 && !player.ModUniqueTask.IsTaskFinish(config.ChapterId) {
+			break
+		}
 
 		if self.PlayerExp >= config.PlayerExp {
 			self.PlayerLevel += 1

@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"gensin-server/csvs"
 	"gensin-server/game"
-	"time"
 )
 
 func main() {
@@ -28,13 +27,13 @@ func main() {
 	go game.GetManageBanWord().Run()
 
 	playerGM := game.NewTestPlayer()
-
-	ticker := time.NewTicker(time.Second * 1)
-	for {
-		select {
-		case <-ticker.C:
-			playerGM.ModPlayer.AddExp(5000)
-		}
-	}
-
+	playerGM.ModPlayer.AddExp(10000000, playerGM)
+	// ticker := time.NewTicker(time.Second * 1)
+	// for {
+	// 	select {
+	// 	case <-ticker.C:
+	// 		playerGM.ModPlayer.AddExp(5000)
+	// 	}
+	// }
+	return
 }

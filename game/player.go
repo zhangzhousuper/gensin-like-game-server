@@ -1,9 +1,10 @@
 package game
 
 type Player struct {
-	ModPlayer *ModPlayer
-	ModIcon   *ModIcon
-	ModCard   *ModCard
+	ModPlayer     *ModPlayer
+	ModIcon       *ModIcon
+	ModCard       *ModCard
+	ModUniqueTask *ModUniqueTask
 }
 
 func NewTestPlayer() *Player {
@@ -12,6 +13,7 @@ func NewTestPlayer() *Player {
 	player.ModPlayer = new(ModPlayer)
 	player.ModIcon = new(ModIcon)
 	player.ModCard = new(ModCard)
+	player.ModUniqueTask = new(ModUniqueTask)
 	// -----------------------------
 	//数据的初始化
 	player.ModPlayer.PlayerLevel = 1
