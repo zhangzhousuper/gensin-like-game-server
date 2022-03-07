@@ -3,6 +3,7 @@ package game
 import (
 	"fmt"
 	"gensin-server/csvs"
+	"time"
 )
 
 type ModPlayer struct {
@@ -15,7 +16,8 @@ type ModPlayer struct {
 	PlayerLevel    int //内部接口
 	PlayerExp      int
 	WorldLevel     int
-	WorldLevelCool int
+	WorrldLevelNow int
+	WorldLevelCool int64
 	Birth          int
 	ShowTeam       []int
 	ShowCard       int
@@ -87,4 +89,42 @@ func (self *ModPlayer) AddExp(exp int, player *Player) {
 		}
 	}
 	fmt.Println("当前等级:", self.PlayerLevel, "---当前经验：", self.PlayerExp)
+}
+
+func (self *ModPlayer) ReduceWorldLevel(player *Player) {
+	if self.WorldLevel < csvs.REDUCE_WORLD_LEVEL_START {
+		fmt.Println("操作失败， ---当前世界等级", self.WorldLevel)
+		return
+	}
+
+	if self.WorldLevel-self.WorrldLevelNow >= csvs.REDUCE_WORLD_LEVEL_MAX {
+		fmt.Println("操作失败 ---当前世界等级", self.WorldLevel, "---真实世界等级", self.WorrldLevelNow)
+	}
+
+	if time.Now().Unix() < int64(self.WorldLevelCool) {
+		fmt.Println("操作失败，---冷却中")
+		return
+	}
+
+	self.WorrldLevelNow -= 1
+	self.WorldLevelCool = time.Now().Unix() + csvs.REDUCE_WORLD_LEVEL_COOL_TIME
+	fmt.Println("操作成功 ---当前世界等级", self.WorldLevel, "---真实世界等级", self.WorrldLevelNow)
+	return
+}
+
+func (self *ModPlayer) ReturnWorldLevel(player *Player) {
+	if self.WorrldLevelNow == self.WorldLevel {
+		fmt.Println("操作失败 ---当前世界等级", self.WorldLevel, "---真实世界等级", self.WorrldLevelNow)
+		return
+	}
+
+	if time.Now().Unix() < self.WorldLevelCool {
+		fmt.Println("操作失败，---冷却中")
+		return
+	}
+
+	self.WorrldLevelNow += 1
+	self.WorldLevelCool = time.Now().Unix() + csvs.REDUCE_WORLD_LEVEL_COOL_TIME
+	fmt.Println("操作成功 ---当前世界等级", self.WorldLevel, "---真实世界等级", self.WorrldLevelNow)
+	return
 }

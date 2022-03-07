@@ -17,6 +17,8 @@ func NewTestPlayer() *Player {
 	// -----------------------------
 	//数据的初始化
 	player.ModPlayer.PlayerLevel = 1
+	player.ModPlayer.WorldLevel = 6
+	player.ModPlayer.WorrldLevelNow = 6
 
 	return player
 }
@@ -37,4 +39,12 @@ func (self *Player) RecvSetName(name string) {
 
 func (self *Player) RecvSetSign(sign string) {
 	self.ModPlayer.SetSign(sign, self)
+}
+
+func (self *Player) ReduceWorldLevel() {
+	self.ModPlayer.ReduceWorldLevel(self)
+}
+
+func (self *Player) ReturnWorldLevel() {
+	self.ModPlayer.ReturnWorldLevel(self)
 }

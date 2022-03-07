@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"gensin-server/csvs"
 	"gensin-server/game"
+	"time"
 )
 
 func main() {
@@ -21,19 +22,22 @@ func main() {
 
 	// 加载配置
 	csvs.CheckLoadCsv()
+	go game.GetManageBanWord().Run()
 
 	fmt.Printf("数据测试 ----start\n")
 
-	go game.GetManageBanWord().Run()
-
 	playerGM := game.NewTestPlayer()
-	playerGM.ModPlayer.AddExp(10000000, playerGM)
-	// ticker := time.NewTicker(time.Second * 1)
-	// for {
-	// 	select {
-	// 	case <-ticker.C:
-	// 		playerGM.ModPlayer.AddExp(5000)
-	// 	}
-	// }
+	//playerGM.ModPlayer.AddExp(10000000, playerGM)
+	ticker := time.NewTicker(time.Second * 1)
+	for {
+		select {
+		case <-ticker.C:
+			if time.Now().Unix()%3 == 0 {
+				playerGM.ReduceWorldLevel()
+			} else if time.Now().Unix()%5 == 0 {
+				playerGM.ReturnWorldLevel()
+			}
+		}
+	}
 	return
 }
