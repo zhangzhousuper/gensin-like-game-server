@@ -20,7 +20,7 @@ type ModPlayer struct {
 	WorldLevelCool int64
 	Birth          int
 	ShowTeam       []int
-	ShowCard       int
+	ShowCard       []int
 	//看不见的字段
 	IsProhibit int //int > bool 方便扩展
 	IsGM       int
@@ -175,4 +175,22 @@ func (self *ModPlayer) IsBirthDay() bool {
 		return true
 	}
 	return false
+}
+
+func (self *ModPlayer) SetShowCard(showCard []int, player *Player) {
+	cardExist := make(map[int]int)
+	newList := make([]int, 0)
+	for _, cardId := range showCard {
+		_, ok := cardExist[cardId]
+		if ok {
+			continue
+		}
+		if !player.ModCard.IsHasCard(cardId) {
+			continue
+		}
+		newList = append(newList, cardId)
+		cardExist[cardId] = 1
+	}
+	self.ShowCard = newList
+	fmt.Println(self.ShowCard)
 }

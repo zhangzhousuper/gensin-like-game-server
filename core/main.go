@@ -26,11 +26,10 @@ func main() {
 	fmt.Printf("数据测试 ----start\n")
 
 	playerGM := game.NewTestPlayer()
-	playerGM.ModPlayer.SetBirth(3001, playerGM)
-	playerGM.ModPlayer.SetBirth(1235, playerGM)
-	playerGM.ModPlayer.SetBirth(10, playerGM)
-	playerGM.ModPlayer.SetBirth(308, playerGM)
-	playerGM.ModPlayer.SetBirth(520, playerGM)
+	playerGM.ModPlayer.SetShowCard([]int{1001, 1001, 1001, 1002, 1001, 1005}, playerGM)
+	playerGM.ModPlayer.SetShowCard([]int{}, playerGM)
+	playerGM.ModPlayer.SetShowCard([]int{1009}, playerGM)
+
 	//playerGM.ModPlayer.AddExp(10000000, playerGM)
 
 	// ticker := time.NewTicker(time.Second * 1)
