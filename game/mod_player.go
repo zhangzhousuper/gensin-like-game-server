@@ -128,3 +128,51 @@ func (self *ModPlayer) ReturnWorldLevel(player *Player) {
 	fmt.Println("操作成功 ---当前世界等级", self.WorldLevel, "---真实世界等级", self.WorrldLevelNow)
 	return
 }
+
+func (self *ModPlayer) SetBirth(birth int, player *Player) {
+	if self.Birth > 0 {
+		fmt.Println("已设置过生日！")
+		return
+	}
+
+	month := birth / 100
+	day := birth % 100
+	switch month {
+	case 1, 3, 5, 7, 8, 10, 12:
+		if day <= 0 || day > 31 {
+			fmt.Println(month, "月没有", day, "日")
+			return
+		}
+	case 4, 6, 9, 11:
+		if day <= 0 || day > 30 {
+			fmt.Println(month, "月没有", day, "日")
+			return
+		}
+	case 2:
+		if day <= 0 || day > 29 {
+			fmt.Println(month, "月没有", day, "日")
+			return
+		}
+	default:
+		fmt.Println("没有", month, "月！")
+		return
+	}
+
+	self.Birth = birth
+	fmt.Println("设置成功，生日为", month, "月", day, "日")
+
+	if self.IsBirthDay() {
+		fmt.Println("今天是你的生日，生日快乐！")
+	} else {
+		fmt.Println("期待你的生日到来")
+	}
+}
+
+func (self *ModPlayer) IsBirthDay() bool {
+	month := time.Now().Month()
+	day := time.Now().Day()
+	if int(month) == self.Birth/100 && day == self.Birth%100 {
+		return true
+	}
+	return false
+}

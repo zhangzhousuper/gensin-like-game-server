@@ -48,3 +48,7 @@ func (self *Player) ReduceWorldLevel() {
 func (self *Player) ReturnWorldLevel() {
 	self.ModPlayer.ReturnWorldLevel(self)
 }
+
+func (self *Player) SetBirth(birth int) {
+	self.ModPlayer.SetBirth(birth, self)
+}
