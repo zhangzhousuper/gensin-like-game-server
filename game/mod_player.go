@@ -6,6 +6,10 @@ import (
 	"time"
 )
 
+type ShowRole struct {
+	RoleId    int
+	RoleLevel int
+}
 type ModPlayer struct {
 	UserId         int
 	Icon           int
@@ -19,7 +23,8 @@ type ModPlayer struct {
 	WorrldLevelNow int
 	WorldLevelCool int64
 	Birth          int
-	ShowTeam       []int
+	ShowTeam       []*ShowRole
+	HideShowTeam   int
 	ShowCard       []int
 	//看不见的字段
 	IsProhibit int //int > bool 方便扩展
@@ -178,6 +183,11 @@ func (self *ModPlayer) IsBirthDay() bool {
 }
 
 func (self *ModPlayer) SetShowCard(showCard []int, player *Player) {
+
+	if len(showCard) > csvs.SHOW_SIZE {
+		return
+	}
+
 	cardExist := make(map[int]int)
 	newList := make([]int, 0)
 	for _, cardId := range showCard {
@@ -193,4 +203,37 @@ func (self *ModPlayer) SetShowCard(showCard []int, player *Player) {
 	}
 	self.ShowCard = newList
 	fmt.Println(self.ShowCard)
+}
+
+func (self *ModPlayer) SetShowTeam(showRole []int, player *Player) {
+	if len(showRole) > csvs.SHOW_SIZE {
+		fmt.Println("消息结构错误")
+		return
+	}
+	roleExist := make(map[int]int)
+	newList := make([]*ShowRole, 0)
+	for _, roleId := range showRole {
+		_, ok := roleExist[roleId]
+		if ok {
+			continue
+		}
+		if !player.ModRole.IsHasRole(roleId) {
+			continue
+		}
+		showRole := new(ShowRole)
+		showRole.RoleId = roleId
+		showRole.RoleLevel = player.ModRole.GetRoleLevel(roleId)
+		newList = append(newList, showRole)
+		roleExist[roleId] = 1
+	}
+	self.ShowTeam = newList
+	fmt.Println(self.ShowTeam)
+}
+
+func (self *ModPlayer) SetHideShowTeam(isHide int, player *Player) {
+	if isHide != csvs.LOGIC_FALSE && isHide != csvs.LOGIC_TRUE {
+		return
+	}
+	self.HideShowTeam = isHide
+
 }

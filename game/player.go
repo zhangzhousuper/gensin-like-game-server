@@ -5,6 +5,7 @@ type Player struct {
 	ModIcon       *ModIcon
 	ModCard       *ModCard
 	ModUniqueTask *ModUniqueTask
+	ModRole       *ModRole
 }
 
 func NewTestPlayer() *Player {
@@ -14,6 +15,8 @@ func NewTestPlayer() *Player {
 	player.ModIcon = new(ModIcon)
 	player.ModCard = new(ModCard)
 	player.ModUniqueTask = new(ModUniqueTask)
+	player.ModUniqueTask.MyTaskInfo = make(map[int]*TaskInfo)
+	player.ModRole = new(ModRole)
 	// -----------------------------
 	//数据的初始化
 	player.ModPlayer.PlayerLevel = 1
@@ -55,4 +58,12 @@ func (self *Player) SetBirth(birth int) {
 
 func (self *Player) SetShowCard(ShowCard []int) {
 	self.ModPlayer.SetShowCard(ShowCard, self)
+}
+
+func (self *Player) SetShowTeam(ShowRole []int) {
+	self.ModPlayer.SetShowTeam(ShowRole, self)
+}
+
+func (self *Player) SetHideShowTeam(isHide int) {
+	self.ModPlayer.SetHideShowTeam(isHide, self)
 }

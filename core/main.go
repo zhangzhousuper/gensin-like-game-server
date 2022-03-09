@@ -26,9 +26,7 @@ func main() {
 	fmt.Printf("数据测试 ----start\n")
 
 	playerGM := game.NewTestPlayer()
-	playerGM.ModPlayer.SetShowCard([]int{1001, 1001, 1001, 1002, 1001, 1005}, playerGM)
-	playerGM.ModPlayer.SetShowCard([]int{}, playerGM)
-	playerGM.ModPlayer.SetShowCard([]int{1009}, playerGM)
+	playerGM.ModPlayer.SetShowTeam([]int{1001, 1001, 1001, 1001, 1001, 1002, 1001, 1005, 1001, 1001, 1001, 1002, 1001, 1005}, playerGM)
 
 	//playerGM.ModPlayer.AddExp(10000000, playerGM)
 
