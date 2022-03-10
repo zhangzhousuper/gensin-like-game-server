@@ -237,3 +237,15 @@ func (self *ModPlayer) SetHideShowTeam(isHide int, player *Player) {
 	self.HideShowTeam = isHide
 
 }
+
+func (self *ModPlayer) SetProhibit(prohibit int) {
+	self.IsProhibit = prohibit
+}
+
+func (self *ModPlayer) SetIsGM(isGM int) {
+	self.IsGM = isGM
+}
+
+func (self *ModPlayer) IsCanEnter() bool {
+	return int64(self.IsProhibit) < time.Now().Unix()
+}

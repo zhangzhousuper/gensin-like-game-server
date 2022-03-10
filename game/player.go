@@ -1,5 +1,10 @@
 package game
 
+import (
+	"fmt"
+	"time"
+)
+
 type Player struct {
 	ModPlayer     *ModPlayer
 	ModIcon       *ModIcon
@@ -66,4 +71,14 @@ func (self *Player) SetShowTeam(ShowRole []int) {
 
 func (self *Player) SetHideShowTeam(isHide int) {
 	self.ModPlayer.SetHideShowTeam(isHide, self)
+}
+
+func (self *Player) Run() {
+	ticker := time.NewTicker((time.Second * 1))
+	for {
+		select {
+		case <-ticker.C:
+			fmt.Println(time.Now().Unix())
+		}
+	}
 }
