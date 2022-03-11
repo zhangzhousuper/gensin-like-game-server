@@ -19,6 +19,7 @@ func NewTestPlayer() *Player {
 	player := new(Player)
 	player.ModPlayer = new(ModPlayer)
 	player.ModIcon = new(ModIcon)
+	player.ModIcon.IconInfo = make(map[int]*Icon)
 	player.ModCard = new(ModCard)
 	player.ModUniqueTask = new(ModUniqueTask)
 	player.ModUniqueTask.MyTaskInfo = make(map[int]*TaskInfo)

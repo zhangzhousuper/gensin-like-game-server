@@ -31,14 +31,9 @@ func main() {
 
 	fmt.Printf("数据测试 ----start\n")
 	playerTest := game.NewTestPlayer()
-	playerTest.ModBag.AddItem(1000003)
-	playerTest.ModBag.AddItem(1000006)
-	playerTest.ModBag.AddItem(1000008)
-	playerTest.ModBag.AddItem(2000002)
-	playerTest.ModBag.AddItem(2000021)
-	playerTest.ModBag.AddItem(2000088)
-	playerTest.ModBag.AddItem(3000004)
-	playerTest.ModBag.AddItem(4000025)
+	playerTest.ModBag.AddItem(3000001, playerTest)
+	playerTest.ModBag.AddItem(3000002, playerTest)
+	playerTest.ModBag.AddItem(3000088, playerTest)
 
 	// ticker := time.NewTicker(time.Second * 10)
 	// for {
