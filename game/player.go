@@ -11,6 +11,7 @@ type Player struct {
 	ModCard       *ModCard
 	ModUniqueTask *ModUniqueTask
 	ModRole       *ModRole
+	ModBag        *ModBag
 }
 
 func NewTestPlayer() *Player {
@@ -22,6 +23,7 @@ func NewTestPlayer() *Player {
 	player.ModUniqueTask = new(ModUniqueTask)
 	player.ModUniqueTask.MyTaskInfo = make(map[int]*TaskInfo)
 	player.ModRole = new(ModRole)
+	player.ModBag = new(ModBag)
 	// -----------------------------
 	//数据的初始化
 	player.ModPlayer.PlayerLevel = 1
