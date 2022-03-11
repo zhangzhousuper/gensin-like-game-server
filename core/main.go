@@ -31,10 +31,9 @@ func main() {
 
 	fmt.Printf("数据测试 ----start\n")
 	playerTest := game.NewTestPlayer()
-	playerTest.ModBag.AddItem(3000001, playerTest)
-	playerTest.ModBag.AddItem(3000002, playerTest)
-	playerTest.ModBag.AddItem(3000088, playerTest)
-
+	playerTest.ModPlayer.SetCard(4000001, playerTest)
+	playerTest.ModBag.AddItem(4000001, playerTest)
+	playerTest.ModPlayer.SetCard(4000001, playerTest)
 	// ticker := time.NewTicker(time.Second * 10)
 	// for {
 	// 	select {

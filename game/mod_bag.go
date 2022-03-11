@@ -29,7 +29,7 @@ func (self *ModBag) AddItem(itemId int, player *Player) {
 		fmt.Println("头像", itemConfig.ItemName)
 		player.ModIcon.AddItem(itemId, player)
 	case csvs.ITEMTYPE_CARD:
-		fmt.Println("名片", itemConfig.ItemName)
+		player.ModCard.AddItem(itemId, 9)
 	}
 
 }

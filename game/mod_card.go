@@ -1,10 +1,38 @@
 package game
 
-type ModCard struct {
-	CardId int
-} // 对于数据库某一张表
+import (
+	"fmt"
+	"gensin-server/csvs"
+)
 
-func (self *ModCard) IsHasCard(iconId int) bool {
-	// icon 是否存在
-	return true
+type Card struct {
+	CardId int
+}
+
+type ModCard struct {
+	CardInfo map[int]*Card
+}
+
+func (self *ModCard) IsHasCard(cardId int) bool {
+	_, ok := self.CardInfo[cardId]
+	return ok
+}
+
+func (self *ModCard) AddItem(itemId int, friendliness int) {
+	_, ok := self.CardInfo[itemId]
+	if ok {
+		fmt.Println("已存在名片", itemId)
+		return
+	}
+	config := csvs.GetCardConfig(itemId)
+	if config == nil {
+		fmt.Println("非法名片:", itemId)
+		return
+	}
+	if friendliness < config.Friendliness {
+		fmt.Println("好感度不足", itemId)
+		return
+	}
+	self.CardInfo[itemId] = &Card{CardId: itemId}
+	fmt.Println("获得名片:", itemId)
 }
