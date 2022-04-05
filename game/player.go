@@ -26,6 +26,7 @@ func NewTestPlayer() *Player {
 	player.ModUniqueTask.MyTaskInfo = make(map[int]*TaskInfo)
 	player.ModRole = new(ModRole)
 	player.ModBag = new(ModBag)
+	player.ModBag.BagInfo = make(map[int]*ItemInfo)
 	// -----------------------------
 	//数据的初始化
 	player.ModPlayer.PlayerLevel = 1

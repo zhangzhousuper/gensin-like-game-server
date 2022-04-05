@@ -1,6 +1,7 @@
 package csvs
 
 import (
+	"fmt"
 	"gensin-server/utils"
 )
 
@@ -24,6 +25,7 @@ var (
 func init() {
 	ConfigItemMap = make(map[int]*ConfigItem)
 	utils.GetCsvUtilMgr().LoadCsv("Item", &ConfigItemMap)
+	fmt.Println("config map init")
 	return
 }
 
