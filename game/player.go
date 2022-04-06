@@ -1,7 +1,6 @@
 package game
 
 import (
-	"fmt"
 	"time"
 )
 
@@ -83,7 +82,11 @@ func (self *Player) Run() {
 	for {
 		select {
 		case <-ticker.C:
-			fmt.Println(time.Now().Unix())
+			if time.Now().Unix()%5 == 0 {
+				self.ModBag.AddItem(1000003, 1000, self)
+			} else {
+				self.ModBag.RemoveItemFromBag(1000003, 300)
+			}
 		}
 	}
 }

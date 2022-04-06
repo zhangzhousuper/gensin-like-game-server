@@ -31,12 +31,11 @@ func main() {
 
 	fmt.Printf("数据测试 ----start\n")
 	playerTest := game.NewTestPlayer()
-	playerTest.ModBag.RemoveItemFromBagGM(1000003, 1000)
-	playerTest.ModBag.RemoveItemFromBagGM(1000003, 1000)
-	playerTest.ModBag.RemoveItemFromBagGM(1000003, 1000)
-	playerTest.ModBag.RemoveItemFromBagGM(1000003, 1000)
-	playerTest.ModBag.RemoveItemFromBagGM(1000003, 1000)
+	go playerTest.Run()
 
+	for {
+
+	}
 	// ticker := time.NewTicker(time.Second * 10)
 	// for {
 	// 	select {
