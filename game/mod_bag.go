@@ -24,7 +24,7 @@ func (self *ModBag) AddItem(itemId int, num int64, player *Player) {
 	case csvs.ITEMTYPE_NORMAL:
 		self.AddItemToBag(itemId, num)
 	case csvs.ITEMTYPE_ROLE:
-		fmt.Println("角色", itemConfig.ItemName)
+		player.ModRole.AddItem(itemId, num)
 	case csvs.ITEMTYPE_ICON:
 		fmt.Println("头像", itemConfig.ItemName)
 		player.ModIcon.AddItem(itemId, player)

@@ -24,8 +24,10 @@ func NewTestPlayer() *Player {
 	player.ModUniqueTask = new(ModUniqueTask)
 	player.ModUniqueTask.MyTaskInfo = make(map[int]*TaskInfo)
 	player.ModRole = new(ModRole)
+	player.ModRole.RoleInfo = make(map[int]*RoleInfo)
 	player.ModBag = new(ModBag)
 	player.ModBag.BagInfo = make(map[int]*ItemInfo)
+
 	// -----------------------------
 	//数据的初始化
 	player.ModPlayer.PlayerLevel = 1
@@ -83,9 +85,7 @@ func (self *Player) Run() {
 		select {
 		case <-ticker.C:
 			if time.Now().Unix()%5 == 0 {
-				self.ModBag.AddItem(1000003, 1000, self)
-			} else {
-				self.ModBag.RemoveItemFromBag(1000003, 300)
+				self.ModBag.AddItem(2000017, 7, self)
 			}
 		}
 	}
