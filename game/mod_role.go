@@ -47,10 +47,10 @@ func (self *ModRole) AddItem(roleId int, num int64, player *Player) {
 			}
 		}
 	}
-
 	itemConfig := csvs.GetItemConfig(roleId)
 	if itemConfig != nil {
 		fmt.Println("获得角色", itemConfig.ItemName, "----", self.RoleInfo[roleId].GetTimes, "次")
 	}
+	player.ModIcon.CheckGetIcon(roleId)
 
 }

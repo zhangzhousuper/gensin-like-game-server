@@ -20,7 +20,7 @@ func (self *ModIcon) IsHasIcon(iconId int) bool {
 	return ok
 }
 
-func (self *ModIcon) AddItem(itemId int, player *Player) {
+func (self *ModIcon) AddItem(itemId int) {
 	_, ok := self.IconInfo[itemId]
 	if ok {
 		fmt.Println("已存在头像", itemId)
@@ -33,4 +33,12 @@ func (self *ModIcon) AddItem(itemId int, player *Player) {
 	}
 	self.IconInfo[itemId] = &Icon{IconId: itemId}
 	fmt.Println("获得头像:", itemId)
+}
+
+func (self *ModIcon) CheckGetIcon(roleId int) {
+	config := csvs.GetIconConfigByRoleId(roleId)
+	if config == nil {
+		return
+	}
+	self.AddItem(config.IconId)
 }
