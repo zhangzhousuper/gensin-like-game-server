@@ -27,9 +27,9 @@ func (self *ModBag) AddItem(itemId int, num int64, player *Player) {
 		player.ModRole.AddItem(itemId, num, player)
 	case csvs.ITEMTYPE_ICON:
 		fmt.Println("头像", itemConfig.ItemName)
-		player.ModIcon.AddItem(itemId, player)
+		player.ModIcon.AddItem(itemId)
 	case csvs.ITEMTYPE_CARD:
-		player.ModCard.AddItem(itemId, 12)
+		go player.ModCard.AddItem(itemId, 12)
 	default: // if too many items
 		//self.AddItemToBag(itemId, 1)
 	}
