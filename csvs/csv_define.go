@@ -10,4 +10,6 @@ const (
 	REDUCE_WORLD_LEVEL_MAX       = 1 // 最多能降低多少级
 	REDUCE_WORLD_LEVEL_COOL_TIME = 10
 	SHOW_SIZE                    = 9
+	ADD_ROLE_TIME_NORMAL_MIN     = 2
+	ADD_ROLE_TIME_NORMAL_MAX     = 7
 )

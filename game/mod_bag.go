@@ -24,7 +24,7 @@ func (self *ModBag) AddItem(itemId int, num int64, player *Player) {
 	case csvs.ITEMTYPE_NORMAL:
 		self.AddItemToBag(itemId, num)
 	case csvs.ITEMTYPE_ROLE:
-		player.ModRole.AddItem(itemId, num)
+		player.ModRole.AddItem(itemId, num, player)
 	case csvs.ITEMTYPE_ICON:
 		fmt.Println("头像", itemConfig.ItemName)
 		player.ModIcon.AddItem(itemId, player)
@@ -65,7 +65,7 @@ func (self *ModBag) RemoveItem(itemId int, num int64, player *Player) {
 	}
 }
 
-func (self *ModBag) RemoveItemFromBag(itemId int, num int64) {
+func (self *ModBag) RemoveItemFromBag(itemId int, num int64, player *Player) {
 
 	if !self.HasEnoughItem(itemId, num) {
 		config := csvs.GetItemConfig(itemId)

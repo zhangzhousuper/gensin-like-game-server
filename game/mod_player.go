@@ -20,7 +20,7 @@ type ModPlayer struct {
 	PlayerLevel    int //内部接口
 	PlayerExp      int
 	WorldLevel     int
-	WorrldLevelNow int
+	WorldLevelNow  int
 	WorldLevelCool int64
 	Birth          int
 	ShowTeam       []*ShowRole
@@ -102,8 +102,8 @@ func (self *ModPlayer) ReduceWorldLevel(player *Player) {
 		return
 	}
 
-	if self.WorldLevel-self.WorrldLevelNow >= csvs.REDUCE_WORLD_LEVEL_MAX {
-		fmt.Println("操作失败 ---当前世界等级", self.WorldLevel, "---真实世界等级", self.WorrldLevelNow)
+	if self.WorldLevel-self.WorldLevelNow >= csvs.REDUCE_WORLD_LEVEL_MAX {
+		fmt.Println("操作失败 ---当前世界等级", self.WorldLevel, "---真实世界等级", self.WorldLevelNow)
 	}
 
 	if time.Now().Unix() < int64(self.WorldLevelCool) {
@@ -111,15 +111,15 @@ func (self *ModPlayer) ReduceWorldLevel(player *Player) {
 		return
 	}
 
-	self.WorrldLevelNow -= 1
+	self.WorldLevelNow -= 1
 	self.WorldLevelCool = time.Now().Unix() + csvs.REDUCE_WORLD_LEVEL_COOL_TIME
-	fmt.Println("操作成功 ---当前世界等级", self.WorldLevel, "---真实世界等级", self.WorrldLevelNow)
+	fmt.Println("操作成功 ---当前世界等级", self.WorldLevel, "---真实世界等级", self.WorldLevelNow)
 	return
 }
 
 func (self *ModPlayer) ReturnWorldLevel(player *Player) {
-	if self.WorrldLevelNow == self.WorldLevel {
-		fmt.Println("操作失败 ---当前世界等级", self.WorldLevel, "---真实世界等级", self.WorrldLevelNow)
+	if self.WorldLevelNow == self.WorldLevel {
+		fmt.Println("操作失败 ---当前世界等级", self.WorldLevel, "---真实世界等级", self.WorldLevelNow)
 		return
 	}
 
@@ -128,9 +128,9 @@ func (self *ModPlayer) ReturnWorldLevel(player *Player) {
 		return
 	}
 
-	self.WorrldLevelNow += 1
+	self.WorldLevelNow += 1
 	self.WorldLevelCool = time.Now().Unix() + csvs.REDUCE_WORLD_LEVEL_COOL_TIME
-	fmt.Println("操作成功 ---当前世界等级", self.WorldLevel, "---真实世界等级", self.WorrldLevelNow)
+	fmt.Println("操作成功 ---当前世界等级", self.WorldLevel, "---真实世界等级", self.WorldLevelNow)
 	return
 }
 
