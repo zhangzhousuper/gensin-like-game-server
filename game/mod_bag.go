@@ -34,6 +34,8 @@ func (self *ModBag) AddItem(itemId int, num int64, player *Player) {
 		player.ModWeapon.AddItem(itemId, num)
 	case csvs.ITEMTYPE_RELICS:
 		player.ModRelics.AddItem(itemId, num)
+	case csvs.ITEMTYPE_COOK:
+		player.ModCook.AddItem(itemId)
 	default: // if too many items
 		//self.AddItemToBag(itemId, 1)
 	}
