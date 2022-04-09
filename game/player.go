@@ -12,6 +12,7 @@ type Player struct {
 	ModUniqueTask *ModUniqueTask
 	ModRole       *ModRole
 	ModBag        *ModBag
+	ModWeapon     *ModWeapon
 }
 
 func NewTestPlayer() *Player {
@@ -28,6 +29,8 @@ func NewTestPlayer() *Player {
 	player.ModRole.RoleInfo = make(map[int]*RoleInfo)
 	player.ModBag = new(ModBag)
 	player.ModBag.BagInfo = make(map[int]*ItemInfo)
+	player.ModWeapon = new(ModWeapon)
+	player.ModWeapon.WeaponInfo = make(map[int]*Weapon)
 	//****************************************
 	player.ModPlayer.PlayerLevel = 1
 	player.ModPlayer.Name = "旅行者"
