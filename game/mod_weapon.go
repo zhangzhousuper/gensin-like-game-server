@@ -17,6 +17,11 @@ type ModWeapon struct {
 
 func (self *ModWeapon) AddItem(itemId int, num int64) {
 
+	config := csvs.GetWeaponConfig(itemId)
+	if config == nil {
+		fmt.Println("配置不存在")
+		return
+	}
 	if len(self.WeaponInfo)+int(num) > csvs.WEAPON_MAX_COUNT {
 		fmt.Println("武器数量超过上限")
 		return
