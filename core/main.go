@@ -25,6 +25,13 @@ func main() {
 	// 4 物品使用
 	// 5 角色模块 -> 头像模块
 
+	//掉落组模块
+	// 1 保底设计
+	// 2 大数据测试 (为策划服务)
+	// 3 更新测试工具
+	// 4 UP池子
+	// 5 仓库检查 (不认为会有)
+
 	// 加载配置
 	csvs.CheckLoadCsv()
 	go game.GetManageBanWord().Run()
