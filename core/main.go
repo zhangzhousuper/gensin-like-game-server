@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"gensin-server/csvs"
 	"gensin-server/game"
+	"math/rand"
+	"time"
 )
 
 func main() {
@@ -33,6 +35,7 @@ func main() {
 	// 5 仓库检查 (不认为会有)
 
 	// 加载配置
+	rand.Seed(time.Now().Unix())
 	csvs.CheckLoadCsv()
 	go game.GetManageBanWord().Run()
 
