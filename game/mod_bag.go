@@ -37,7 +37,7 @@ func (self *ModBag) AddItem(itemId int, num int64, player *Player) {
 	case csvs.ITEMTYPE_COOK:
 		player.ModCook.AddItem(itemId)
 	default: // if too many items
-		//self.AddItemToBag(itemId, 1)
+		self.AddItemToBag(itemId, num)
 	}
 }
 
@@ -128,4 +128,46 @@ func (self *ModBag) HasEnoughItem(itemId int, num int64) bool {
 	}
 
 	return true
+}
+
+func (self *ModBag) UseItem(itemId int, num int64, player *Player) {
+	itemConfig := csvs.GetItemConfig(itemId)
+	if itemConfig == nil {
+		fmt.Println("物品不存在")
+		return
+	}
+
+	if !self.HasEnoughItem(itemId, num) {
+		config := csvs.GetItemConfig(itemId)
+		if config != nil {
+			nowNum := int64(0)
+			_, ok := self.BagInfo[itemId]
+			if ok {
+				nowNum = self.BagInfo[itemId].ItemNum
+			}
+			fmt.Println(config.ItemName, "数量不足 ---当前数量", nowNum, "需要数量", num)
+		}
+		return
+	}
+
+	switch itemConfig.SortType {
+	case csvs.ITEMTYPE_COOKBOOK:
+		self.UseCookBook(itemId, num, player)
+	case csvs.ITEMTYPE_FOOD:
+		// 给英雄加属性
+	default: // 同普通
+		fmt.Println(itemId, "物品无法使用")
+		return
+	}
+}
+
+func (self *ModBag) UseCookBook(itemId int, num int64, player *Player) {
+	cookBookConfig := csvs.GetCookBookConfig(itemId)
+	if cookBookConfig == nil {
+		fmt.Println(itemId, "物品不存在")
+		return
+	}
+
+	self.RemoveItem(itemId, num, player)
+	self.AddItem(cookBookConfig.Reward, num, player)
 }

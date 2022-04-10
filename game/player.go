@@ -258,7 +258,7 @@ func (self *Player) HandleBagSetBirth() {
 //背包
 func (self *Player) HandleBag() {
 	for {
-		fmt.Println("当前处于基础信息界面,请选择操作：0返回1增加物品2扣除物品")
+		fmt.Println("当前处于基础信息界面,请选择操作：0返回1增加物品2扣除物品3使用物品")
 		var action int
 		fmt.Scan(&action)
 		switch action {
@@ -268,6 +268,8 @@ func (self *Player) HandleBag() {
 			self.HandleBagAddItem()
 		case 2:
 			self.HandleBagRemoveItem()
+		case 3:
+			self.HandleBagUseItem()
 		}
 	}
 }
@@ -290,6 +292,16 @@ func (self *Player) HandleBagRemoveItem() {
 	fmt.Println("物品数量")
 	fmt.Scan(&itemNum)
 	self.ModBag.RemoveItemFromBag(itemId, int64(itemNum), self)
+}
+
+func (self *Player) HandleBagUseItem() {
+	itemId := 0
+	itemNum := 0
+	fmt.Println("物品ID")
+	fmt.Scan(&itemId)
+	fmt.Println("物品数量")
+	fmt.Scan(&itemNum)
+	self.ModBag.UseItem(itemId, int64(itemNum), self)
 }
 
 //地图

@@ -14,6 +14,7 @@ const (
 	ITEMTYPE_RELICS   = 7
 	ITEMTYPE_COOKBOOK = 8
 	ITEMTYPE_COOK     = 9
+	ITEMTYPE_FOOD     = 10
 )
 
 type ConfigItem struct {
