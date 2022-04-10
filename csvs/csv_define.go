@@ -6,12 +6,14 @@ const (
 )
 
 const (
-	REDUCE_WORLD_LEVEL_START     = 5 //降低世界等级的要求
-	REDUCE_WORLD_LEVEL_MAX       = 1 // 最多能降低多少级
-	REDUCE_WORLD_LEVEL_COOL_TIME = 10
-	SHOW_SIZE                    = 9
-	ADD_ROLE_TIME_NORMAL_MIN     = 2
-	ADD_ROLE_TIME_NORMAL_MAX     = 7
-	WEAPON_MAX_COUNT             = 2000
-	Relics_MAX_COUNT             = 1500
+	REDUCE_WORLD_LEVEL_START         = 5 //降低世界等级的要求
+	REDUCE_WORLD_LEVEL_MAX           = 1 // 最多能降低多少级
+	REDUCE_WORLD_LEVEL_COOL_TIME     = 10
+	SHOW_SIZE                        = 9
+	ADD_ROLE_TIME_NORMAL_MIN         = 2
+	ADD_ROLE_TIME_NORMAL_MAX         = 7
+	WEAPON_MAX_COUNT                 = 2000
+	Relics_MAX_COUNT                 = 1500
+	FIVE_STAR_TIMES_LIMIT            = 73
+	FIVE_STAR_TIMES_LIMIT_EACH_VALUE = 600
 )
