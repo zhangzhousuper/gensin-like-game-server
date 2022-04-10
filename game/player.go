@@ -16,6 +16,7 @@ type Player struct {
 	ModRelics     *ModRelics
 	ModCook       *ModCook
 	ModHome       *ModHome
+	ModPool       *ModPool
 }
 
 func NewTestPlayer() *Player {
@@ -40,6 +41,8 @@ func NewTestPlayer() *Player {
 	player.ModCook.CookInfo = make(map[int]*Cook)
 	player.ModHome = new(ModHome)
 	player.ModHome.HomeItemIdInfo = make(map[int]*HomeItemId)
+	player.ModPool = new(ModPool)
+	player.ModPool.UpPoolInfo = new(PoolInfo)
 	//****************************************
 	player.ModPlayer.PlayerLevel = 1
 	player.ModPlayer.Name = "旅行者"
@@ -92,6 +95,7 @@ func (self *Player) SetHideShowTeam(isHide int) {
 }
 
 func (self *Player) Run() {
+	self.ModPool.DoPool()
 	fmt.Println("从0开始写原神服务器------测试工具v0.1")
 	fmt.Println("作者:B站------golang大海葵")
 	fmt.Println("模拟用户创建成功OK------开始测试")

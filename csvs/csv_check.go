@@ -33,7 +33,7 @@ func MakeDropGroupMap() {
 		dropGroup.WeightAll += v.Weight
 		dropGroup.DropConfigs = append(dropGroup.DropConfigs, v)
 	}
-	RunDropTest()
+	//RunDropTest()
 	return
 }
 
