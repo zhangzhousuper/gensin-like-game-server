@@ -19,9 +19,3 @@ func (self *ModUniqueTask) IsTaskFinish(taskId int) bool {
 	}
 	return task.State == TASK_STATE_FINISH
 }
-
-const (
-	TASK_STATE_INIT   = 0
-	TASK_STATE_DOING  = 0
-	TASK_STATE_FINISH = 0
-) // 做突破任务时无法联机

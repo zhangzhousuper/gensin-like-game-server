@@ -23,7 +23,7 @@ func (self *ModRelics) AddItem(itemId int, num int64) {
 		return
 	}
 
-	if len(self.RelicsInfo)+int(num) > csvs.Relics_MAX_COUNT {
+	if len(self.RelicsInfo)+int(num) > csvs.RELICS_MAX_COUNT {
 		fmt.Println("超过最大值")
 		return
 	}

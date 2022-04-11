@@ -5,6 +5,12 @@ import (
 	"gensin-server/csvs"
 )
 
+const (
+	TASK_STATE_INIT   = 0
+	TASK_STATE_DOING  = 1
+	TASK_STATE_FINISH = 2
+)
+
 type Player struct {
 	ModPlayer     *ModPlayer
 	ModIcon       *ModIcon
@@ -45,7 +51,7 @@ func NewTestPlayer() *Player {
 	player.ModPool = new(ModPool)
 	player.ModPool.UpPoolInfo = new(PoolInfo)
 	player.ModMap = new(ModMap)
-	player.ModMap.MapInfo = new(Map)
+	player.ModMap.InitData()
 	//****************************************
 	player.ModPlayer.PlayerLevel = 1
 	player.ModPlayer.Name = "旅行者"
@@ -97,13 +103,17 @@ func (self *Player) SetHideShowTeam(isHide int) {
 	self.ModPlayer.SetHideShowTeam(isHide, self)
 }
 
+func (self *Player) SetEventState(state int) {
+	//self.ModMap.SetEventState(state, self)
+}
+
 func (self *Player) Run() {
 	fmt.Println("从0开始写原神服务器------测试工具v0.1")
 	fmt.Println("作者:B站------golang大海葵")
 	fmt.Println("模拟用户创建成功OK------开始测试")
 	fmt.Println("↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓")
 	for {
-		fmt.Println(self.ModPlayer.Name, ",欢迎来到提瓦特大陆,请选择功能：1基础信息2背包3(优菈UP池)模拟抽卡1000W次4地图(未开放)")
+		fmt.Println(self.ModPlayer.Name, ",欢迎来到提瓦特大陆,请选择功能：1基础信息2背包3(优菈UP池)模拟抽卡1000W次4地图")
 		var modChoose int
 		fmt.Scan(&modChoose)
 		switch modChoose {
@@ -363,6 +373,41 @@ func (self *Player) HandleBagUseItem() {
 //地图
 func (self *Player) HandleMap() {
 	fmt.Println("向着星辰与深渊,欢迎来到冒险家协会！")
-	fmt.Println("当前位置:", "蒙德城")
-	fmt.Println("地图模块还没写到......")
+	for {
+		fmt.Println("请选择互动地图1蒙德2璃月1001深入风龙废墟")
+		var action int
+		fmt.Scan(&action)
+		switch action {
+		case 0:
+			return
+		default:
+			self.HandleMapIn(action)
+		}
+	}
+}
+
+func (self *Player) HandleMapIn(mapId int) {
+
+	config := csvs.ConfigMapMap[mapId]
+	if config == nil {
+		fmt.Println("无法识别的地图")
+		return
+	}
+	for {
+		self.ModMap.GetEventList(config)
+		fmt.Println("请选择触发事件Id(0返回)")
+		var action int
+		fmt.Scan(&action)
+		switch action {
+		case 0:
+			return
+		default:
+			eventConfig := csvs.ConfigMapEventMap[action]
+			if eventConfig == nil {
+				fmt.Println("无法识别的事件")
+				break
+			}
+			self.ModMap.SetEventState(mapId, eventConfig.EventId, csvs.EVENT_END)
+		}
+	}
 }
