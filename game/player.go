@@ -17,6 +17,7 @@ type Player struct {
 	ModCook       *ModCook
 	ModHome       *ModHome
 	ModPool       *ModPool
+	ModMap        *ModMap
 }
 
 func NewTestPlayer() *Player {
@@ -43,6 +44,8 @@ func NewTestPlayer() *Player {
 	player.ModHome.HomeItemIdInfo = make(map[int]*HomeItemId)
 	player.ModPool = new(ModPool)
 	player.ModPool.UpPoolInfo = new(PoolInfo)
+	player.ModMap = new(ModMap)
+	player.ModMap.MapInfo = new(Map)
 	//****************************************
 	player.ModPlayer.PlayerLevel = 1
 	player.ModPlayer.Name = "旅行者"
