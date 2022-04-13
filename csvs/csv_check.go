@@ -6,7 +6,8 @@ import (
 )
 
 var (
-	ConfigDropGroupMap map[int]*DropGroup
+	ConfigDropGroupMap     map[int]*DropGroup
+	ConfigDropItemGroupMap map[int]*DropItemGroup
 )
 
 type DropGroup struct {
@@ -15,9 +16,15 @@ type DropGroup struct {
 	DropConfigs []*ConfigDrop
 }
 
+type DropItemGroup struct {
+	DropId      int
+	DropConfigs []*ConfigDropItem
+}
+
 func CheckLoadCsv() {
 	// double check
 	MakeDropGroupMap()
+	MakeDropItemGroupMap()
 	fmt.Println("csv init finished")
 }
 
@@ -33,7 +40,36 @@ func MakeDropGroupMap() {
 		dropGroup.WeightAll += v.Weight
 		dropGroup.DropConfigs = append(dropGroup.DropConfigs, v)
 	}
-	//RunDropTest()
+	//RandDropTest()
+	return
+}
+
+func MakeDropItemGroupMap() {
+	ConfigDropItemGroupMap = make(map[int]*DropItemGroup)
+	for _, v := range ConfigDropItemSlice {
+		dropGroup, ok := ConfigDropItemGroupMap[v.DropId]
+		if !ok {
+			dropGroup = new(DropItemGroup)
+			dropGroup.DropId = v.DropId
+			ConfigDropItemGroupMap[v.DropId] = dropGroup
+		}
+		dropGroup.DropConfigs = append(dropGroup.DropConfigs, v)
+	}
+	//RandDropItemTest()
+	return
+}
+
+func RandDropItemTest() {
+	dropGroup := ConfigDropItemGroupMap[2]
+	if dropGroup == nil {
+		return
+	}
+	for _, v := range dropGroup.DropConfigs {
+		randNum := rand.Intn(PERCENT_ALL)
+		if randNum < v.Weight {
+			fmt.Println(v.ItemId)
+		}
+	}
 	return
 }
 
@@ -205,4 +241,23 @@ func GetRandDropNew2(dropGroup *DropGroup, fiveInfo map[int]int, fourInfo map[in
 		}
 	}
 	return nil
+}
+
+//获得配置的接口
+func GetDropItemGroup(dropId int) *DropItemGroup {
+	return ConfigDropItemGroupMap[dropId]
+}
+
+func GetDropItemGroupNew(dropId int) []*ConfigDropItem {
+	rel := make([]*ConfigDropItem, 0)
+	config := GetDropItemGroup(dropId)
+	for _, v := range config.DropConfigs {
+		if v.DropType == DROP_ITEM_TYPE_ITEM {
+			rel = append(rel, v)
+		} else if v.DropType == DROP_ITEM_TYPE_GROUP {
+			configs := GetDropItemGroupNew(v.ItemId)
+			rel = append(rel, configs...)
+		}
+	}
+	return rel
 }

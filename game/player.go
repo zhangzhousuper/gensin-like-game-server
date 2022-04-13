@@ -393,6 +393,7 @@ func (self *Player) HandleMapIn(mapId int) {
 		fmt.Println("无法识别的地图")
 		return
 	}
+	// self.ModMap.RefreshByPlayer(mapId)
 	for {
 		self.ModMap.GetEventList(config)
 		fmt.Println("请选择触发事件Id(0返回)")
@@ -407,7 +408,7 @@ func (self *Player) HandleMapIn(mapId int) {
 				fmt.Println("无法识别的事件")
 				break
 			}
-			self.ModMap.SetEventState(mapId, eventConfig.EventId, csvs.EVENT_END)
+			self.ModMap.SetEventState(mapId, eventConfig.EventId, csvs.EVENT_END, self)
 		}
 	}
 }

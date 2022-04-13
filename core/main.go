@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"gensin-server/csvs"
 	"gensin-server/game"
 	"math/rand"
@@ -44,7 +43,7 @@ func main() {
 	csvs.CheckLoadCsv()
 	go game.GetManageBanWord().Run()
 
-	fmt.Printf("数据测试 ----start\n")
+	//fmt.Printf("数据测试 ----start\n")
 	playerTest := game.NewTestPlayer()
 	go playerTest.Run()
 

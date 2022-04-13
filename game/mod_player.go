@@ -249,3 +249,7 @@ func (self *ModPlayer) SetIsGM(isGM int) {
 func (self *ModPlayer) IsCanEnter() bool {
 	return int64(self.IsProhibit) < time.Now().Unix()
 }
+
+func (self *ModPlayer) GetWorldLevelNow() int {
+	return self.WorldLevelNow
+}

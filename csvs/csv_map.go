@@ -8,12 +8,15 @@ type ConfigMap struct {
 }
 
 type ConfigMapEvent struct {
-	EventId     int    `json:"EventId"`
-	EventType   int    `json:"EventType"`
-	Name        string `json:"Name"`
-	RefreshType int    `json:"RefreshType"`
-	EventDrop   int    `json:"EventDrop"`
-	MapId       int    `json:"MapId"`
+	EventId        int    `json:"EventId"`
+	EventType      int    `json:"EventType"`
+	Name           string `json:"Name"`
+	RefreshType    int    `json:"RefreshType"`
+	EventDrop      int    `json:"EventDrop"`
+	EventDropTimes int    `json:"EventDropTimes"`
+	MapId          int    `json:"MapId"`
+	CostItem       int    `json:"CostItem"`
+	CostNum        int64  `json:"CostNum"`
 }
 
 var (

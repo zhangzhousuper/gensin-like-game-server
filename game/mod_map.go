@@ -3,6 +3,7 @@ package game
 import (
 	"fmt"
 	"gensin-server/csvs"
+	"math/rand"
 	"time"
 )
 
@@ -40,7 +41,7 @@ func (self *ModMap) InitData() {
 		if !ok {
 			self.MapInfo[v.MapId].EventInfo[v.EventId] = new(Event)
 			self.MapInfo[v.MapId].EventInfo[v.EventId].EventId = v.EventId
-			self.MapInfo[v.MapId].EventInfo[v.EventId].State = csvs.LOGIC_FALSE
+			self.MapInfo[v.MapId].EventInfo[v.EventId].State = csvs.EVENT_START
 		}
 	}
 }
@@ -70,7 +71,7 @@ func (self *ModMap) GetEventList(config *csvs.ConfigMap) {
 	}
 }
 
-func (self *ModMap) SetEventState(mapId int, eventId int, state int) {
+func (self *ModMap) SetEventState(mapId int, eventId int, state int, player *Player) {
 	_, ok := self.MapInfo[mapId]
 	if !ok {
 		fmt.Println("地图不存在")
@@ -85,18 +86,32 @@ func (self *ModMap) SetEventState(mapId int, eventId int, state int) {
 		fmt.Println("状态异常")
 		return
 	}
+	eventConfig := csvs.GetEventConfig(self.MapInfo[mapId].EventInfo[eventId].EventId)
+	if eventConfig == nil {
+		return
+	}
+
 	self.MapInfo[mapId].EventInfo[eventId].State = state
 	if state == csvs.EVENT_FINISH {
 		fmt.Println("事件完成")
 	}
 	if state == csvs.EVENT_END {
+		config := csvs.GetDropItemGroupNew(eventConfig.EventDrop)
+		for _, v := range config {
+			randNum := rand.Intn(csvs.PERCENT_ALL)
+			if randNum < v.Weight {
+				randAll := v.ItemNumMax - v.ItemNumMin + 1
+				itemNum := rand.Intn(randAll) + v.ItemNumMin
+				worldLevel := player.ModPlayer.GetWorldLevelNow()
+				if worldLevel > 0 {
+					itemNum = itemNum * (csvs.PERCENT_ALL + worldLevel*v.WorldAdd) / csvs.PERCENT_ALL
+				}
+				player.ModBag.AddItem(v.ItemId, int64(itemNum), player)
+			}
+		}
 		fmt.Println("事件领取")
 	}
 	if state > 0 {
-		eventConfig := csvs.GetEventConfig(self.MapInfo[mapId].EventInfo[eventId].EventId)
-		if eventConfig == nil {
-			return
-		}
 		switch eventConfig.RefreshType {
 		case csvs.MAP_REFRESH_SELF:
 			self.MapInfo[mapId].EventInfo[eventId].NextResetTime = time.Now().Unix() + csvs.MAP_REFRESH_SELF_TIME
@@ -159,7 +174,7 @@ func (self *ModMap) CheckRefresh(event *Event) {
 	if eventConfig == nil {
 		return
 	}
-	event.State = csvs.EVENT_START
+
 	switch eventConfig.RefreshType {
 	case csvs.MAP_REFRESH_DAY:
 		count := time.Now().Unix() / csvs.MAP_REFRESH_DAY_TIME

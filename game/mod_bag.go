@@ -17,7 +17,7 @@ type ModBag struct {
 func (self *ModBag) AddItem(itemId int, num int64, player *Player) {
 	itemConfig := csvs.GetItemConfig(itemId)
 	if itemConfig == nil {
-		fmt.Println("物品不存在")
+		fmt.Println(itemId, "物品不存在")
 		return
 	}
 	switch itemConfig.SortType {
@@ -29,7 +29,7 @@ func (self *ModBag) AddItem(itemId int, num int64, player *Player) {
 		fmt.Println("头像", itemConfig.ItemName)
 		player.ModIcon.AddItem(itemId)
 	case csvs.ITEMTYPE_CARD:
-		go player.ModCard.AddItem(itemId, 12)
+		player.ModCard.AddItem(itemId, 12)
 	case csvs.ITEMTYPE_WEAPON:
 		player.ModWeapon.AddItem(itemId, num)
 	case csvs.ITEMTYPE_RELICS:
@@ -73,8 +73,39 @@ func (self *ModBag) RemoveItem(itemId int, num int64, player *Player) {
 	}
 }
 
-func (self *ModBag) RemoveItemFromBag(itemId int, num int64, player *Player) {
+func (self *ModBag) RemoveItemFromBagGM(itemId int, num int64) {
+	_, ok := self.BagInfo[itemId]
+	if ok {
+		self.BagInfo[itemId].ItemNum -= num
+	} else {
+		self.BagInfo[itemId] = &ItemInfo{
+			ItemId:  itemId,
+			ItemNum: 0 - num,
+		}
+	}
 
+	config := csvs.GetItemConfig(itemId)
+	if config != nil {
+		fmt.Println("扣除物品", config.ItemName, "----数量", num, "当前数量", self.BagInfo[itemId].ItemNum)
+	}
+}
+
+func (self *ModBag) RemoveItemFromBag(itemId int, num int64, player *Player) {
+	itemConfig := csvs.GetItemConfig(itemId)
+	switch itemConfig.SortType {
+	//case csvs.ITEMTYPE_NORMAL:
+	//	self.AddItemToBag(itemId, num)
+	case csvs.ITEMTYPE_ROLE:
+		fmt.Println("此物品无法扣除")
+		return
+	case csvs.ITEMTYPE_ICON:
+		fmt.Println("此物品无法扣除")
+		return
+	case csvs.ITEMTYPE_CARD:
+		fmt.Println("此物品无法扣除")
+		return
+	default: //同普通
+	}
 	if !self.HasEnoughItem(itemId, num) {
 		config := csvs.GetItemConfig(itemId)
 		if config != nil {
@@ -104,29 +135,15 @@ func (self *ModBag) RemoveItemFromBag(itemId int, num int64, player *Player) {
 	}
 }
 
-func (self *ModBag) RemoveItemFromBagGM(itemId int, num int64) {
-	_, ok := self.BagInfo[itemId]
-	if ok {
-		self.BagInfo[itemId].ItemNum -= num
-	} else {
-		self.BagInfo[itemId] = &ItemInfo{
-			ItemId:  itemId,
-			ItemNum: 0 - num,
-		}
-	}
-
-	config := csvs.GetItemConfig(itemId)
-	if config != nil {
-		fmt.Println("扣除物品", config.ItemName, "----数量", num, "当前数量", self.BagInfo[itemId].ItemNum)
-	}
-}
-
 func (self *ModBag) HasEnoughItem(itemId int, num int64) bool {
+	if itemId == 0 {
+		return true
+	}
 	_, ok := self.BagInfo[itemId]
 	if !ok {
 		return false
 	} else if self.BagInfo[itemId].ItemNum < num {
-		return true
+		return false
 	}
 
 	return true
@@ -135,7 +152,7 @@ func (self *ModBag) HasEnoughItem(itemId int, num int64) bool {
 func (self *ModBag) UseItem(itemId int, num int64, player *Player) {
 	itemConfig := csvs.GetItemConfig(itemId)
 	if itemConfig == nil {
-		fmt.Println("物品不存在")
+		fmt.Println(itemId, "物品不存在")
 		return
 	}
 
