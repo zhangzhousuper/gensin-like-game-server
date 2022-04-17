@@ -190,3 +190,15 @@ func (self *ModBag) UseCookBook(itemId int, num int64, player *Player) {
 	self.RemoveItem(itemId, num, player)
 	self.AddItem(cookBookConfig.Reward, num, player)
 }
+
+func (self *ModBag) GetItemNum(itemId int, player *Player) int64 {
+	itemConfig := csvs.GetItemConfig(itemId)
+	if itemConfig == nil {
+		return 0
+	}
+	_, ok := self.BagInfo[itemId]
+	if !ok {
+		return 0
+	}
+	return self.BagInfo[itemId].ItemNum
+}

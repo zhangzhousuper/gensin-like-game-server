@@ -279,7 +279,7 @@ func (self *Player) HandleBagSetBirth() {
 //背包
 func (self *Player) HandleBag() {
 	for {
-		fmt.Println("当前处于基础信息界面,请选择操作：0返回1增加物品2扣除物品3使用物品")
+		fmt.Println("当前处于基础信息界面,请选择操作：0返回1增加物品2扣除物品3使用物品4升级七天神像(风)")
 		var action int
 		fmt.Scan(&action)
 		switch action {
@@ -291,6 +291,8 @@ func (self *Player) HandleBag() {
 			self.HandleBagRemoveItem()
 		case 3:
 			self.HandleBagUseItem()
+		case 4:
+			self.HandleBagWindStatue()
 		}
 	}
 }
@@ -368,6 +370,12 @@ func (self *Player) HandleBagUseItem() {
 	fmt.Println("物品数量")
 	fmt.Scan(&itemNum)
 	self.ModBag.UseItem(itemId, int64(itemNum), self)
+}
+
+func (self *Player) HandleBagWindStatue() {
+	fmt.Println("开始升级七天神像")
+	self.ModMap.UpStatue(1, self)
+	self.ModRole.CalHpPool()
 }
 
 //地图

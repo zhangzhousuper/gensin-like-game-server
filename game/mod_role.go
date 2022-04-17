@@ -3,6 +3,7 @@ package game
 import (
 	"fmt"
 	"gensin-server/csvs"
+	"time"
 )
 
 type RoleInfo struct {
@@ -11,7 +12,9 @@ type RoleInfo struct {
 }
 
 type ModRole struct {
-	RoleInfo map[int]*RoleInfo
+	RoleInfo  map[int]*RoleInfo
+	HpPool    int
+	HpCalTime int64
 }
 
 func (self *ModRole) IsHasRole(roleId int) bool {
@@ -82,4 +85,15 @@ func (self *ModRole) GetRoleInfoForPoolCheck() (map[int]int, map[int]int) {
 		}
 	}
 	return fiveInfo, fourInfo
+}
+
+func (self *ModRole) CalHpPool() {
+	if self.HpCalTime == 0 {
+		self.HpCalTime = time.Now().Unix()
+	}
+
+	calTime := time.Now().Unix() - self.HpCalTime
+	self.HpPool += int(calTime) * 10
+	self.HpCalTime = time.Now().Unix()
+	fmt.Println("当前血池回复量:", self.HpPool)
 }

@@ -5,6 +5,7 @@ import "gensin-server/utils"
 type ConfigMap struct {
 	MapId   int    `json:"MapId"`
 	MapName string `json:"MapName"`
+	MapType int    `json:"MapType"`
 }
 
 type ConfigMapEvent struct {

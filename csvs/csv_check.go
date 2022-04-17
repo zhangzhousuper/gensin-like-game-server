@@ -8,6 +8,7 @@ import (
 var (
 	ConfigDropGroupMap     map[int]*DropGroup
 	ConfigDropItemGroupMap map[int]*DropItemGroup
+	ConfigStatueMap        map[int]map[int]*ConfigStatue
 )
 
 type DropGroup struct {
@@ -25,6 +26,7 @@ func CheckLoadCsv() {
 	// double check
 	MakeDropGroupMap()
 	MakeDropItemGroupMap()
+	MakeConfigStatueMap()
 	fmt.Println("csv init finished")
 }
 
@@ -56,6 +58,19 @@ func MakeDropItemGroupMap() {
 		dropGroup.DropConfigs = append(dropGroup.DropConfigs, v)
 	}
 	//RandDropItemTest()
+	return
+}
+
+func MakeConfigStatueMap() {
+	ConfigStatueMap = make(map[int]map[int]*ConfigStatue)
+	for _, v := range ConfigStatueSlice {
+		statueMap, ok := ConfigStatueMap[v.StatueId]
+		if !ok {
+			statueMap = make(map[int]*ConfigStatue)
+			ConfigStatueMap[v.StatueId] = statueMap
+		}
+		statueMap[v.Level] = v
+	}
 	return
 }
 
@@ -260,4 +275,17 @@ func GetDropItemGroupNew(dropId int) []*ConfigDropItem {
 		}
 	}
 	return rel
+}
+
+func GetStatueConfig(statueId int, level int) *ConfigStatue {
+	_, ok := ConfigStatueMap[statueId]
+	if !ok {
+		return nil
+	}
+
+	_, ok = ConfigStatueMap[statueId][level]
+	if !ok {
+		return nil
+	}
+	return ConfigStatueMap[statueId][level]
 }

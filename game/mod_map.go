@@ -18,12 +18,20 @@ type Event struct {
 	NextResetTime int64
 }
 
+type StatueInfo struct {
+	StatueId int
+	Level    int
+	ItemInfo map[int]*ItemInfo
+}
+
 type ModMap struct {
 	MapInfo map[int]*Map
+	Statue  map[int]*StatueInfo
 }
 
 func (self *ModMap) InitData() {
 	self.MapInfo = make(map[int]*Map)
+	self.Statue = make(map[int]*StatueInfo)
 
 	for _, v := range csvs.ConfigMapMap {
 		_, ok := self.MapInfo[v.MapId]
@@ -185,5 +193,82 @@ func (self *ModMap) CheckRefresh(event *Event) {
 		count++
 		event.NextResetTime = count * csvs.MAP_REFRESH_WEEK_TIME
 	case csvs.MAP_REFRESH_SELF:
+	case csvs.MAP_REFRESH_CANT:
+		return
+	}
+	event.State = csvs.EVENT_START
+}
+
+func (self *ModMap) RefreshByPlayer(mapId int) {
+	config := csvs.ConfigMapMap[mapId]
+	if config == nil {
+		return
+	}
+	if config.MapType != csvs.REFRESH_PLAYER {
+		return
+	}
+	_, ok := self.MapInfo[config.MapId]
+	if !ok {
+		return
+	}
+	for _, v := range self.MapInfo[config.MapId].EventInfo {
+		v.State = csvs.EVENT_START
+	}
+}
+
+func (self *ModMap) NewStatue(statueId int) *StatueInfo {
+	data := new(StatueInfo)
+	data.StatueId = statueId
+	data.Level = 0
+	data.ItemInfo = make(map[int]*ItemInfo)
+	return data
+}
+func (self *ModMap) UpStatue(statueId int, player *Player) {
+	_, ok := self.Statue[statueId]
+	if !ok {
+		self.Statue[statueId] = self.NewStatue(statueId)
+	}
+	info, ok := self.Statue[statueId]
+	if !ok {
+		return
+	}
+	nextLevel := info.Level + 1
+	nextConfig := csvs.GetStatueConfig(statueId, nextLevel)
+	if nextConfig == nil {
+		return
+	}
+
+	_, okNow := info.ItemInfo[nextConfig.CostItem]
+	nowNum := int64(0)
+	if okNow {
+		nowNum = info.ItemInfo[nextConfig.CostItem].ItemNum
+	}
+	needNum := nextConfig.CostNum - nowNum
+
+	if !player.ModBag.HasEnoughItem(nextConfig.CostItem, needNum) {
+		num := player.ModBag.GetItemNum(nextConfig.CostItem, player)
+		if num <= 0 {
+			fmt.Println(fmt.Sprintf("神像升级物品不足"))
+			return
+		}
+		_, okItem := info.ItemInfo[nextConfig.CostItem]
+		if !okItem {
+			info.ItemInfo[nextConfig.CostItem] = new(ItemInfo)
+			info.ItemInfo[nextConfig.CostItem].ItemId = nextConfig.CostItem
+			info.ItemInfo[nextConfig.CostItem].ItemNum = 0
+		}
+		_, okItem = info.ItemInfo[nextConfig.CostItem]
+		if !okItem {
+			return
+		}
+		info.ItemInfo[nextConfig.CostItem].ItemNum += num
+		player.ModBag.RemoveItemFromBag(nextConfig.CostItem, num, player)
+		fmt.Println(fmt.Sprintf("神像升级,提交物品%d，数量%d，当前数量%d", nextConfig.CostItem, num, info.ItemInfo[nextConfig.CostItem].ItemNum))
+
+	} else {
+		player.ModBag.RemoveItemFromBag(nextConfig.CostItem, needNum, player)
+		info.Level++
+		info.ItemInfo = make(map[int]*ItemInfo)
+		fmt.Println(fmt.Sprintf("神像升级成功,神像:%d，当前等级:%d", info.StatueId, info.Level))
 	}
 }
