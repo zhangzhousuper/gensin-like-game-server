@@ -382,7 +382,7 @@ func (self *Player) HandleBagWindStatue() {
 func (self *Player) HandleMap() {
 	fmt.Println("向着星辰与深渊,欢迎来到冒险家协会！")
 	for {
-		fmt.Println("请选择互动地图1蒙德2璃月1001深入风龙废墟")
+		fmt.Println("请选择互动地图1蒙德2璃月1001深入风龙废墟2001无妄引咎密宫")
 		var action int
 		fmt.Scan(&action)
 		switch action {

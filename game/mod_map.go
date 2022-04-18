@@ -98,6 +98,32 @@ func (self *ModMap) SetEventState(mapId int, eventId int, state int, player *Pla
 	if eventConfig == nil {
 		return
 	}
+	configMap := csvs.ConfigMapMap[mapId]
+	if configMap == nil {
+		return
+	}
+	if !player.ModBag.HasEnoughItem(eventConfig.CostItem, eventConfig.CostNum) {
+		fmt.Println(fmt.Sprintf("%s不足!", csvs.GetItemName(eventConfig.CostItem)))
+		return
+	}
+	if configMap.MapType == csvs.REFRESH_PLAYER && eventConfig.EventType == csvs.EVENT_TYPE_REWARD {
+		for _, v := range self.MapInfo[mapId].EventInfo {
+			eventConfigNow := csvs.GetEventConfig(v.EventId)
+			if eventConfigNow == nil {
+				continue
+			}
+			if eventConfigNow.EventType != csvs.EVENT_TYPE_NORMAL {
+				continue
+			}
+			if v.EventId == eventId {
+				continue
+			}
+			if v.State != csvs.EVENT_END {
+				fmt.Println("有事件尚未完成:", v.EventId)
+				return
+			}
+		}
+	}
 
 	self.MapInfo[mapId].EventInfo[eventId].State = state
 	if state == csvs.EVENT_FINISH {
