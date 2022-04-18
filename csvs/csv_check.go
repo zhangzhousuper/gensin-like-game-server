@@ -265,13 +265,45 @@ func GetDropItemGroup(dropId int) *DropItemGroup {
 
 func GetDropItemGroupNew(dropId int) []*ConfigDropItem {
 	rel := make([]*ConfigDropItem, 0)
+	if dropId == 0 {
+		return rel
+	}
 	config := GetDropItemGroup(dropId)
+	configsAll := make([]*ConfigDropItem, 0)
 	for _, v := range config.DropConfigs {
 		if v.DropType == DROP_ITEM_TYPE_ITEM {
 			rel = append(rel, v)
 		} else if v.DropType == DROP_ITEM_TYPE_GROUP {
-			configs := GetDropItemGroupNew(v.ItemId)
-			rel = append(rel, configs...)
+			randNum := rand.Intn(PERCENT_ALL)
+			if randNum < v.Weight {
+				configs := GetDropItemGroupNew(v.ItemId)
+				rel = append(rel, configs...)
+			}
+		} else if v.DropType == DROP_ITEM_TYPE_WEIGHT {
+			configsAll = append(configsAll, v)
+		}
+	}
+	if len(configsAll) > 0 {
+		allRate := 0
+		for _, v := range configsAll {
+			allRate += v.Weight
+		}
+		randNum := rand.Intn(allRate)
+		nowRate := 0
+		for _, v := range configsAll {
+			nowRate += v.Weight
+			if nowRate > randNum {
+				newConfig := new(ConfigDropItem)
+				newConfig.Weight = PERCENT_ALL
+				newConfig.DropId = v.DropId
+				newConfig.DropType = v.DropType
+				newConfig.ItemId = v.ItemId
+				newConfig.ItemNumMin = v.ItemNumMin
+				newConfig.ItemNumMax = v.ItemNumMax
+				newConfig.WorldAdd = v.WorldAdd
+				rel = append(rel, newConfig)
+				break
+			}
 		}
 	}
 	return rel
