@@ -113,7 +113,7 @@ func (self *Player) Run() {
 	fmt.Println("模拟用户创建成功OK------开始测试")
 	fmt.Println("↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓")
 	for {
-		fmt.Println(self.ModPlayer.Name, ",欢迎来到提瓦特大陆,请选择功能：1基础信息2背包3(优菈UP池)模拟抽卡1000W次4地图")
+		fmt.Println(self.ModPlayer.Name, ",欢迎来到提瓦特大陆,请选择功能：1基础信息2背包3角色(甘雨UP池)4地图5圣遗物6角色")
 		var modChoose int
 		fmt.Scan(&modChoose)
 		switch modChoose {
@@ -125,6 +125,10 @@ func (self *Player) Run() {
 			self.HandlePool()
 		case 4:
 			self.HandleMap()
+		case 5:
+			self.HandleRelics()
+		case 6:
+			self.HandleRole()
 		}
 	}
 }
@@ -308,7 +312,7 @@ func (self *Player) HandlePool() {
 		case 0:
 			return
 		case 1:
-			self.ModRole.HandleSendRoleInfo()
+			self.ModRole.HandleSendRoleInfo(self)
 		case 2:
 			self.ModPool.HandleUpPoolTen(self)
 		case 3:
@@ -401,7 +405,7 @@ func (self *Player) HandleMapIn(mapId int) {
 		fmt.Println("无法识别的地图")
 		return
 	}
-	// self.ModMap.RefreshByPlayer(mapId)
+	self.ModMap.RefreshByPlayer(mapId)
 	for {
 		self.ModMap.GetEventList(config)
 		fmt.Println("请选择触发事件Id(0返回)")
@@ -418,5 +422,110 @@ func (self *Player) HandleMapIn(mapId int) {
 			}
 			self.ModMap.SetEventState(mapId, eventConfig.EventId, csvs.EVENT_END, self)
 		}
+	}
+}
+
+func (self *Player) HandleRelics() {
+	for {
+		fmt.Println("当前处于圣遗物界面，选择功能0返回1强化测试2满级圣遗物3极品头测试")
+		var action int
+		fmt.Scan(&action)
+		switch action {
+		case 0:
+			return
+		case 1:
+			self.ModRelics.RelicsUp(self)
+		case 2:
+			self.ModRelics.RelicsTop(self)
+		case 3:
+			self.ModRelics.RelicsTestBest(self)
+		default:
+			fmt.Println("无法识别在操作")
+		}
+	}
+}
+
+func (self *Player) HandleRole() {
+	for {
+		fmt.Println("当前处于角色界面，选择功能0返回1查询2穿戴圣遗物3卸下圣遗物4穿戴武器5卸下武器")
+		var action int
+		fmt.Scan(&action)
+		switch action {
+		case 0:
+			return
+		case 1:
+			self.ModRole.HandleSendRoleInfo(self)
+		case 2:
+			self.HandleWearRelics()
+		case 3:
+			self.HandleTakeOffRelics()
+
+		default:
+			fmt.Println("无法识别在操作")
+		}
+	}
+}
+
+func (self *Player) HandleWearRelics() {
+	for {
+		fmt.Println("输入操作的目标英雄Id:,0返回")
+		var roleId int
+		fmt.Scan(&roleId)
+
+		if roleId == 0 {
+			return
+		}
+
+		RoleInfo := self.ModRole.RoleInfo[roleId]
+		if RoleInfo == nil {
+			fmt.Println("英雄不存在")
+			continue
+		}
+
+		RoleInfo.ShowInfo(self)
+		fmt.Println("输入需要穿戴的圣遗物key:,0返回")
+		var relicsKey int
+		fmt.Scan(&relicsKey)
+		if relicsKey == 0 {
+			return
+		}
+		relics := self.ModRelics.RelicsInfo[relicsKey]
+		if relics == nil {
+			fmt.Println("圣遗物不存在")
+			continue
+		}
+		self.ModRole.WearRelics(RoleInfo, relics, self)
+	}
+}
+
+func (self *Player) HandleTakeOffRelics() {
+	for {
+		fmt.Println("输入操作的目标英雄Id:,0返回")
+		var roleId int
+		fmt.Scan(&roleId)
+
+		if roleId == 0 {
+			return
+		}
+
+		RoleInfo := self.ModRole.RoleInfo[roleId]
+		if RoleInfo == nil {
+			fmt.Println("英雄不存在")
+			continue
+		}
+
+		RoleInfo.ShowInfo(self)
+		fmt.Println("输入需要卸下的圣遗物key:,0返回")
+		var relicsKey int
+		fmt.Scan(&relicsKey)
+		if relicsKey == 0 {
+			return
+		}
+		relics := self.ModRelics.RelicsInfo[relicsKey]
+		if relics == nil {
+			fmt.Println("圣遗物不存在")
+			continue
+		}
+		self.ModRole.TakeOffRelics(RoleInfo, relics, self)
 	}
 }

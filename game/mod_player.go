@@ -253,3 +253,7 @@ func (self *ModPlayer) IsCanEnter() bool {
 func (self *ModPlayer) GetWorldLevelNow() int {
 	return self.WorldLevelNow
 }
+
+func (self *ModPlayer) RelicsUp(player *Player) {
+	player.ModRelics.RelicsUp(player)
+}

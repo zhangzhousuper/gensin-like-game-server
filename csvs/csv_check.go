@@ -6,9 +6,12 @@ import (
 )
 
 var (
-	ConfigDropGroupMap     map[int]*DropGroup
-	ConfigDropItemGroupMap map[int]*DropItemGroup
-	ConfigStatueMap        map[int]map[int]*ConfigStatue
+	ConfigDropGroupMap        map[int]*DropGroup
+	ConfigDropItemGroupMap    map[int]*DropItemGroup
+	ConfigStatueMap           map[int]map[int]*ConfigStatue
+	ConfigRelicsEntryGroupMap map[int]map[int]*ConfigRelicsEntry
+	ConfigRelicsLevelMap      map[int]map[int]*ConfigRelicsLevel
+	ConfigRelicsSuitMap       map[int][]*ConfigRelicsSuit
 )
 
 type DropGroup struct {
@@ -27,6 +30,9 @@ func CheckLoadCsv() {
 	MakeDropGroupMap()
 	MakeDropItemGroupMap()
 	MakeConfigStatueMap()
+	MakeConfigRelicsEntryGroupMap()
+	MakeConfigRelicsLevelMap()
+	MakeConfigRelicsSuitMap()
 	fmt.Println("csv init finished")
 }
 
@@ -74,6 +80,38 @@ func MakeConfigStatueMap() {
 	return
 }
 
+func MakeConfigRelicsEntryGroupMap() {
+	ConfigRelicsEntryGroupMap = make(map[int]map[int]*ConfigRelicsEntry)
+	for _, v := range ConfigRelicsEntryMap {
+		groupMap, ok := ConfigRelicsEntryGroupMap[v.Group]
+		if !ok {
+			groupMap = make(map[int]*ConfigRelicsEntry)
+			ConfigRelicsEntryGroupMap[v.Group] = groupMap
+		}
+		groupMap[v.Id] = v
+	}
+	return
+}
+
+func MakeConfigRelicsLevelMap() {
+	ConfigRelicsLevelMap = make(map[int]map[int]*ConfigRelicsLevel)
+	for _, v := range ConfigRelicsLevelSlice {
+		levelMap, ok := ConfigRelicsLevelMap[v.EntryId]
+		if !ok {
+			levelMap = make(map[int]*ConfigRelicsLevel)
+			ConfigRelicsLevelMap[v.EntryId] = levelMap
+		}
+		levelMap[v.Level] = v
+	}
+	return
+}
+func MakeConfigRelicsSuitMap() {
+	ConfigRelicsSuitMap = make(map[int][]*ConfigRelicsSuit)
+	for _, v := range ConfigRelicsSuitSlice {
+		ConfigRelicsSuitMap[v.Type] = append(ConfigRelicsSuitMap[v.Type], v)
+	}
+	return
+}
 func RandDropItemTest() {
 	dropGroup := ConfigDropItemGroupMap[2]
 	if dropGroup == nil {
@@ -320,4 +358,17 @@ func GetStatueConfig(statueId int, level int) *ConfigStatue {
 		return nil
 	}
 	return ConfigStatueMap[statueId][level]
+}
+
+func GetReliceLevelConfig(mainEntry int, level int) *ConfigRelicsLevel {
+	_, ok := ConfigRelicsLevelMap[mainEntry]
+	if !ok {
+		return nil
+	}
+
+	_, ok = ConfigRelicsLevelMap[mainEntry][level]
+	if !ok {
+		return nil
+	}
+	return ConfigRelicsLevelMap[mainEntry][level]
 }

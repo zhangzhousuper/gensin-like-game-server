@@ -7,8 +7,10 @@ import (
 )
 
 type RoleInfo struct {
-	RoleId   int
-	GetTimes int
+	RoleId     int
+	GetTimes   int
+	RelicsInfo []int
+	WeaponInfo int
 }
 
 type ModRole struct {
@@ -44,7 +46,7 @@ func (self *ModRole) AddItem(roleId int, num int64, player *Player) {
 			self.RoleInfo[roleId].GetTimes += 1
 			if self.RoleInfo[roleId].GetTimes >= csvs.ADD_ROLE_TIME_NORMAL_MIN && self.RoleInfo[roleId].GetTimes <= csvs.ADD_ROLE_TIME_NORMAL_MAX {
 				player.ModBag.AddItemToBag(config.Stuff, config.StuffNum)
-				player.ModBag.AddItemToBag(config.StuffItem, config.StuffNum)
+				player.ModBag.AddItemToBag(config.StuffItem, config.StuffItemNum)
 			} else {
 				player.ModBag.AddItemToBag(config.MaxStuffItem, config.MaxStuffItemNum)
 			}
@@ -58,15 +60,16 @@ func (self *ModRole) AddItem(roleId int, num int64, player *Player) {
 	player.ModCard.CheckGetCard(roleId, 10)
 }
 
-func (self *ModRole) HandleSendRoleInfo() {
-	fmt.Println(fmt.Sprintf("当前拥有角色如下:"))
+func (self *ModRole) HandleSendRoleInfo(player *Player) {
+	fmt.Println(fmt.Sprintf("当前拥有角色信息如下:"))
 	for _, v := range self.RoleInfo {
-		v.SendRoleInfo()
+		v.SendRoleInfo(player)
 	}
 }
 
-func (self *RoleInfo) SendRoleInfo() {
-	fmt.Println(fmt.Sprintf("%s:,获得次数:%d", csvs.GetItemName(self.RoleId), self.GetTimes))
+func (self *RoleInfo) SendRoleInfo(player *Player) {
+	fmt.Println(fmt.Sprintf("%s:,Id:%d,累计获得次数:%d", csvs.GetItemName(self.RoleId), self.RoleId, self.GetTimes))
+	self.ShowInfo(player)
 }
 
 func (self *ModRole) GetRoleInfoForPoolCheck() (map[int]int, map[int]int) {
@@ -96,4 +99,113 @@ func (self *ModRole) CalHpPool() {
 	self.HpPool += int(calTime) * 10
 	self.HpCalTime = time.Now().Unix()
 	fmt.Println("当前血池回复量:", self.HpPool)
+}
+
+//把圣遗物穿在角色身上
+func (self *ModRole) WearRelics(roleInfo *RoleInfo, relics *Relics, player *Player) {
+	relicsConfig := csvs.GetRelicsConfig(relics.RelicsId)
+	if relicsConfig == nil {
+		return
+	}
+	self.CheckRelicsPos(roleInfo, relicsConfig.Pos)
+	if relicsConfig.Pos < 0 || relicsConfig.Pos > len(roleInfo.RelicsInfo) {
+		return
+	}
+
+	oldRelicsKeyId := roleInfo.RelicsInfo[relicsConfig.Pos-1]
+	if oldRelicsKeyId > 0 {
+		oldRelics := player.ModRelics.RelicsInfo[oldRelicsKeyId]
+		if oldRelics != nil {
+			oldRelics.RoleId = 0
+		}
+		roleInfo.RelicsInfo[relicsConfig.Pos-1] = 0
+	}
+
+	oldRoleId := relics.RoleId
+	if oldRoleId > 0 {
+		oldRole := player.ModRole.RoleInfo[oldRoleId]
+		if oldRole != nil {
+			oldRole.RelicsInfo[relicsConfig.Pos-1] = 0
+		}
+		relics.RoleId = 0
+	}
+
+	roleInfo.RelicsInfo[relicsConfig.Pos-1] = relics.KeyId
+	relics.RoleId = roleInfo.RoleId
+
+	if oldRelicsKeyId > 0 && oldRoleId > 0 {
+		oldRelics := player.ModRelics.RelicsInfo[oldRelicsKeyId]
+		oldRole := player.ModRole.RoleInfo[oldRoleId]
+		if oldRelics != nil && oldRole != nil {
+			self.WearRelics(oldRole, oldRelics, player)
+		}
+	}
+
+	roleInfo.ShowInfo(player)
+}
+
+func (self *ModRole) CheckRelicsPos(roleInfo *RoleInfo, pos int) {
+	nowSize := len(roleInfo.RelicsInfo)
+	needAdd := pos - nowSize
+
+	for i := 0; i < needAdd; i++ {
+		roleInfo.RelicsInfo = append(roleInfo.RelicsInfo, 0)
+	}
+}
+
+func (self *RoleInfo) ShowInfo(player *Player) {
+	fmt.Println(fmt.Sprintf("当前角色:%s,角色ID:%d", csvs.GetItemName(self.RoleId), self.RoleId))
+
+	weaponNow := player.ModWeapon.WeaponInfo[self.WeaponInfo]
+	if weaponNow == nil {
+		fmt.Println(fmt.Sprintf("武器:未穿戴"))
+	} else {
+		fmt.Println(fmt.Sprintf("武器:%s,key:%d", csvs.GetItemName(weaponNow.WeaponId), self.WeaponInfo))
+	}
+
+	suitMap := make(map[int]int)
+	for _, v := range self.RelicsInfo {
+		relicsNow := player.ModRelics.RelicsInfo[v]
+		if relicsNow == nil {
+			fmt.Println(fmt.Sprintf("未穿戴"))
+			continue
+		}
+		fmt.Println(fmt.Sprintf("%s,key:%d", csvs.GetItemName(relicsNow.RelicsId), v))
+		relicsNowConfig := csvs.GetRelicsConfig(relicsNow.RelicsId)
+		if relicsNowConfig != nil {
+			suitMap[relicsNowConfig.Type]++
+		}
+	}
+
+	suitSkill := make([]int, 0)
+	for suit, num := range suitMap {
+		for _, config := range csvs.ConfigRelicsSuitMap[suit] {
+			if num >= config.Num {
+				suitSkill = append(suitSkill, config.SuitSkill)
+			}
+		}
+	}
+	for _, v := range suitSkill {
+		fmt.Println(fmt.Sprintf("激活套装效果:%d", v))
+	}
+
+}
+
+func (self *ModRole) TakeOffRelics(roleInfo *RoleInfo, relics *Relics, player *Player) {
+	relicsConfig := csvs.GetRelicsConfig(relics.RelicsId)
+	if relicsConfig == nil {
+		return
+	}
+	self.CheckRelicsPos(roleInfo, relicsConfig.Pos)
+	if relicsConfig.Pos < 0 || relicsConfig.Pos > len(roleInfo.RelicsInfo) {
+		return
+	}
+	if roleInfo.RelicsInfo[relicsConfig.Pos-1] != relics.KeyId {
+		fmt.Println(fmt.Sprintf("当前角色没有穿戴这个物品"))
+		return
+	}
+
+	roleInfo.RelicsInfo[relicsConfig.Pos-1] = 0
+	relics.RoleId = 0
+	roleInfo.ShowInfo(player)
 }
