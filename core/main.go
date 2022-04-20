@@ -47,6 +47,12 @@ func main() {
 	// 6  套装
 	// 7  洗练（方便测试）
 
+	// 武器模块
+	// 1  强化  40
+	// 2  突破
+	// 3  精炼
+	// 4  穿和卸下
+	// 5  替换
 	// 加载配置
 	rand.Seed(time.Now().Unix())
 	csvs.CheckLoadCsv()
