@@ -12,6 +12,8 @@ var (
 	ConfigRelicsEntryGroupMap map[int]map[int]*ConfigRelicsEntry
 	ConfigRelicsLevelMap      map[int]map[int]*ConfigRelicsLevel
 	ConfigRelicsSuitMap       map[int][]*ConfigRelicsSuit
+	ConfigWeaponLevelMap      map[int]map[int]*ConfigWeaponLevel
+	ConfigWeaponStarMap       map[int]map[int]*ConfigWeaponStar
 )
 
 type DropGroup struct {
@@ -33,6 +35,8 @@ func CheckLoadCsv() {
 	MakeConfigRelicsEntryGroupMap()
 	MakeConfigRelicsLevelMap()
 	MakeConfigRelicsSuitMap()
+	MakeConfigWeaponLevelMap()
+	MakeConfigWeaponStarMap()
 	fmt.Println("csv init finished")
 }
 
@@ -109,6 +113,32 @@ func MakeConfigRelicsSuitMap() {
 	ConfigRelicsSuitMap = make(map[int][]*ConfigRelicsSuit)
 	for _, v := range ConfigRelicsSuitSlice {
 		ConfigRelicsSuitMap[v.Type] = append(ConfigRelicsSuitMap[v.Type], v)
+	}
+	return
+}
+
+func MakeConfigWeaponLevelMap() {
+	ConfigWeaponLevelMap = make(map[int]map[int]*ConfigWeaponLevel)
+	for _, v := range ConfigWeaponLevelSlice {
+		levelMap, ok := ConfigWeaponLevelMap[v.WeaponStar]
+		if !ok {
+			levelMap = make(map[int]*ConfigWeaponLevel)
+			ConfigWeaponLevelMap[v.WeaponStar] = levelMap
+		}
+		levelMap[v.Level] = v
+	}
+	return
+}
+
+func MakeConfigWeaponStarMap() {
+	ConfigWeaponStarMap = make(map[int]map[int]*ConfigWeaponStar)
+	for _, v := range ConfigWeaponStarSlice {
+		starMap, ok := ConfigWeaponStarMap[v.WeaponStar]
+		if !ok {
+			starMap = make(map[int]*ConfigWeaponStar)
+			ConfigWeaponStarMap[v.WeaponStar] = starMap
+		}
+		starMap[v.StarLevel] = v
 	}
 	return
 }
@@ -371,4 +401,30 @@ func GetReliceLevelConfig(mainEntry int, level int) *ConfigRelicsLevel {
 		return nil
 	}
 	return ConfigRelicsLevelMap[mainEntry][level]
+}
+
+func GetWeaponLevelConfig(weaponStar int, level int) *ConfigWeaponLevel {
+	_, ok := ConfigWeaponLevelMap[weaponStar]
+	if !ok {
+		return nil
+	}
+
+	_, ok = ConfigWeaponLevelMap[weaponStar][level]
+	if !ok {
+		return nil
+	}
+	return ConfigWeaponLevelMap[weaponStar][level]
+}
+
+func GetWeaponStarConfig(weaponStar int, starLevel int) *ConfigWeaponStar {
+	_, ok := ConfigWeaponStarMap[weaponStar]
+	if !ok {
+		return nil
+	}
+
+	_, ok = ConfigWeaponStarMap[weaponStar][starLevel]
+	if !ok {
+		return nil
+	}
+	return ConfigWeaponStarMap[weaponStar][starLevel]
 }

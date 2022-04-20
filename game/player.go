@@ -113,7 +113,7 @@ func (self *Player) Run() {
 	fmt.Println("模拟用户创建成功OK------开始测试")
 	fmt.Println("↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓")
 	for {
-		fmt.Println(self.ModPlayer.Name, ",欢迎来到提瓦特大陆,请选择功能：1基础信息2背包3角色(甘雨UP池)4地图5圣遗物6角色")
+		fmt.Println(self.ModPlayer.Name, ",欢迎来到提瓦特大陆,请选择功能：1基础信息2背包3角色(八重神子UP池)4地图5圣遗物6角色7武器")
 		var modChoose int
 		fmt.Scan(&modChoose)
 		switch modChoose {
@@ -129,6 +129,8 @@ func (self *Player) Run() {
 			self.HandleRelics()
 		case 6:
 			self.HandleRole()
+		case 7:
+			self.HandleWeapon()
 		}
 	}
 }
@@ -459,6 +461,8 @@ func (self *Player) HandleRole() {
 			self.HandleWearRelics()
 		case 3:
 			self.HandleTakeOffRelics()
+		case 4:
+			// self.HandleWearWeapon()
 
 		default:
 			fmt.Println("无法识别在操作")
@@ -527,5 +531,41 @@ func (self *Player) HandleTakeOffRelics() {
 			continue
 		}
 		self.ModRole.TakeOffRelics(RoleInfo, relics, self)
+	}
+}
+
+func (self *Player) HandleWeapon() {
+	for {
+		fmt.Println("当前处于武器界面，选择功能0返回1强化测试2突破测试3精炼测试")
+		var action int
+		fmt.Scan(&action)
+		switch action {
+		case 0:
+			return
+		case 1:
+			self.HandleWeaponUp()
+		case 2:
+			// self.HandleWeaponStarUp()
+		case 3:
+			// self.HandleWeaponRefineUp()
+		default:
+			fmt.Println("无法识别在操作")
+		}
+	}
+}
+
+func (self *Player) HandleWeaponUp() {
+	for {
+		fmt.Println("输入操作的目标武器keyId:,0返回")
+		for _, v := range self.ModWeapon.WeaponInfo {
+			fmt.Println(fmt.Sprintf("武器keyId:%d,等级:%d,突破等级:%d,精炼:%d",
+				v.KeyId, v.Level, v.StarLevel, v.RefineLevel))
+		}
+		var weaponKeyId int
+		fmt.Scan(&weaponKeyId)
+		if weaponKeyId == 0 {
+			return
+		}
+		self.ModWeapon.WeaponUp(weaponKeyId, self)
 	}
 }
