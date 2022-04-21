@@ -78,3 +78,26 @@ func (self *Weapon) ShowInfo() {
 	fmt.Println(fmt.Sprintf("当前等级:%d,当前经验:%d,当前突破等级:%d,当前精炼等级:%d",
 		self.Level, self.Exp, self.StarLevel, self.RefineLevel))
 }
+
+func (self *ModWeapon) WeaponUpStar(keyId int, player *Player) {
+	weapon := self.WeaponInfo[keyId]
+	if weapon == nil {
+		return
+	}
+	weaponConfig := csvs.GetWeaponConfig(weapon.WeaponId)
+	if weaponConfig == nil {
+		return
+	}
+	nextStarConfig := csvs.GetWeaponStarConfig(weaponConfig.Star, weapon.StarLevel+1)
+	if nextStarConfig == nil {
+		return
+	}
+	//验证物品充足并扣除
+	//........
+	if weapon.Level < nextStarConfig.Level {
+		fmt.Println("武器等级不够，无法突破")
+		return
+	}
+	weapon.StarLevel++
+	weapon.ShowInfo()
+}

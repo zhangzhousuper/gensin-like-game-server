@@ -545,7 +545,7 @@ func (self *Player) HandleWeapon() {
 		case 1:
 			self.HandleWeaponUp()
 		case 2:
-			// self.HandleWeaponStarUp()
+			self.HandleWeaponStarUp()
 		case 3:
 			// self.HandleWeaponRefineUp()
 		default:
@@ -567,5 +567,21 @@ func (self *Player) HandleWeaponUp() {
 			return
 		}
 		self.ModWeapon.WeaponUp(weaponKeyId, self)
+	}
+}
+
+func (self *Player) HandleWeaponStarUp() {
+	for {
+		fmt.Println("输入操作的目标武器keyId:,0返回")
+		for _, v := range self.ModWeapon.WeaponInfo {
+			fmt.Println(fmt.Sprintf("武器keyId:%d,等级:%d,突破等级:%d,精炼:%d",
+				v.KeyId, v.Level, v.StarLevel, v.RefineLevel))
+		}
+		var weaponKeyId int
+		fmt.Scan(&weaponKeyId)
+		if weaponKeyId == 0 {
+			return
+		}
+		self.ModWeapon.WeaponUpStar(weaponKeyId, self)
 	}
 }
