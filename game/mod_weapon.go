@@ -101,3 +101,29 @@ func (self *ModWeapon) WeaponUpStar(keyId int, player *Player) {
 	weapon.StarLevel++
 	weapon.ShowInfo()
 }
+
+func (self *ModWeapon) WeaponUpRefine(keyId int, targetKeyId int, plyaer *Player) {
+	if keyId == targetKeyId {
+		fmt.Println("错误的材料")
+		return
+	}
+	weapon := self.WeaponInfo[keyId]
+	if weapon == nil {
+		return
+	}
+	weaponTarget := self.WeaponInfo[targetKeyId]
+	if weaponTarget == nil {
+		return
+	}
+	if weapon.WeaponId != weaponTarget.WeaponId {
+		fmt.Println("错误的材料")
+		return
+	}
+	if weapon.RefineLevel >= csvs.WEAPON_MAX_REFINE {
+		fmt.Println("已经达到最大精炼等级")
+		return
+	}
+	weapon.RefineLevel++
+	delete(self.WeaponInfo, targetKeyId)
+	weapon.ShowInfo()
+}

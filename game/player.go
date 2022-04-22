@@ -547,7 +547,7 @@ func (self *Player) HandleWeapon() {
 		case 2:
 			self.HandleWeaponStarUp()
 		case 3:
-			// self.HandleWeaponRefineUp()
+			self.HandleWeaponRefineUp()
 		default:
 			fmt.Println("无法识别在操作")
 		}
@@ -583,5 +583,29 @@ func (self *Player) HandleWeaponStarUp() {
 			return
 		}
 		self.ModWeapon.WeaponUpStar(weaponKeyId, self)
+	}
+}
+
+func (self *Player) HandleWeaponRefineUp() {
+	for {
+		fmt.Println("输入操作的目标武器keyId:,0返回")
+		for _, v := range self.ModWeapon.WeaponInfo {
+			fmt.Println(fmt.Sprintf("武器keyId:%d,等级:%d,突破等级:%d,精炼:%d",
+				v.KeyId, v.Level, v.StarLevel, v.RefineLevel))
+		}
+		var weaponKeyId int
+		fmt.Scan(&weaponKeyId)
+		if weaponKeyId == 0 {
+			return
+		}
+		for {
+			fmt.Println("输入作为材料的武器keyId:,0返回")
+			var weaponTargetKeyId int
+			fmt.Scan(&weaponTargetKeyId)
+			if weaponTargetKeyId == 0 {
+				return
+			}
+			self.ModWeapon.WeaponUpRefine(weaponKeyId, weaponTargetKeyId, self)
+		}
 	}
 }

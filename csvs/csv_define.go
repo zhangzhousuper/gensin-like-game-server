@@ -50,4 +50,5 @@ const (
 	FOUR_STAR_TIMES_LIMIT            = 8
 	FOUR_STAR_TIMES_LIMIT_EACH_VALUE = 5100
 	ALL_ENTRY_RATE                   = 2000
+	WEAPON_MAX_REFINE                = 5 //武器的最大精炼等级
 )
