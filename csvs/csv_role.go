@@ -11,6 +11,7 @@ type ConfigRole struct {
 	StuffItemNum    int64 `json:"StuffItemNum"`
 	MaxStuffItem    int   `json:"MaxStuffItem"`
 	MaxStuffItemNum int64 `json:"MaxStuffItemNum"`
+	Type            int   `json:"Type"`
 }
 
 var (

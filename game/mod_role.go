@@ -209,3 +209,63 @@ func (self *ModRole) TakeOffRelics(roleInfo *RoleInfo, relics *Relics, player *P
 	relics.RoleId = 0
 	roleInfo.ShowInfo(player)
 }
+
+func (self *ModRole) WearWeapon(roleInfo *RoleInfo, weapon *Weapon, player *Player) {
+	weaponConfig := csvs.GetWeaponConfig(weapon.WeaponId)
+	if weaponConfig == nil {
+		fmt.Println("数据异常，武器配置不存在")
+		return
+	}
+	//先判断武器和角色是否匹配
+	roleConfig := csvs.GetRoleConfig(roleInfo.RoleId)
+	if roleConfig.Type != weaponConfig.Type {
+		fmt.Println("武器和角色不匹配")
+		return
+	}
+
+	oldWeaponKey := 0
+	if roleInfo.WeaponInfo > 0 {
+		oldWeaponKey = roleInfo.WeaponInfo
+		roleInfo.WeaponInfo = 0
+		oldWeapon := player.ModWeapon.WeaponInfo[oldWeaponKey]
+		if oldWeapon != nil {
+			oldWeapon.RoleId = 0
+		}
+	}
+
+	oldRoleId := 0
+	if weapon.RoleId > 0 {
+		oldRoleId = weapon.RoleId
+		weapon.RoleId = 0
+		oldRole := player.ModRole.RoleInfo[oldRoleId]
+		if oldRole != nil {
+			oldRole.WeaponInfo = 0
+		}
+	}
+
+	roleInfo.WeaponInfo = weapon.KeyId
+	weapon.RoleId = roleInfo.RoleId
+
+	if roleInfo.WeaponInfo > 0 && weapon.RoleId > 0 {
+		oldWeapon := player.ModWeapon.WeaponInfo[oldWeaponKey]
+		oldRole := player.ModRole.RoleInfo[oldRoleId]
+		if oldWeapon != nil && oldRole != nil {
+			self.WearWeapon(oldRole, oldWeapon, player)
+		}
+	}
+}
+
+func (self *ModRole) TakeOffWeapon(roleInfo *RoleInfo, weapon *Weapon, player *Player) {
+	weaponConfig := csvs.GetWeaponConfig(weapon.WeaponId)
+	if weaponConfig == nil {
+		fmt.Println("数据异常，武器配置不存在")
+		return
+	}
+	if roleInfo.WeaponInfo != weapon.KeyId {
+		fmt.Println("角色没有装备这把武器")
+		return
+	}
+	//根据位置看是否身上有对应圣遗物
+	roleInfo.WeaponInfo = 0
+	weapon.RoleId = 0
+}

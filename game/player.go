@@ -462,7 +462,9 @@ func (self *Player) HandleRole() {
 		case 3:
 			self.HandleTakeOffRelics()
 		case 4:
-			// self.HandleWearWeapon()
+			self.HandleWearWeapon()
+		case 5:
+			self.HandleTakeOffWeapon()
 
 		default:
 			fmt.Println("无法识别在操作")
@@ -607,5 +609,71 @@ func (self *Player) HandleWeaponRefineUp() {
 			}
 			self.ModWeapon.WeaponUpRefine(weaponKeyId, weaponTargetKeyId, self)
 		}
+	}
+}
+
+func (self *Player) HandleWearWeapon() {
+	for {
+		fmt.Println("输入操作的目标英雄Id:,0返回")
+		var roleId int
+		fmt.Scan(&roleId)
+
+		if roleId == 0 {
+			return
+		}
+
+		RoleInfo := self.ModRole.RoleInfo[roleId]
+		if RoleInfo == nil {
+			fmt.Println("英雄不存在")
+			continue
+		}
+
+		RoleInfo.ShowInfo(self)
+		fmt.Println("输入需要穿戴的武器key:,0返回")
+		var weaponKey int
+		fmt.Scan(&weaponKey)
+		if weaponKey == 0 {
+			return
+		}
+		weaponInfo := self.ModWeapon.WeaponInfo[weaponKey]
+		if weaponInfo == nil {
+			fmt.Println("武器不存在")
+			continue
+		}
+		self.ModRole.WearWeapon(RoleInfo, weaponInfo, self)
+		RoleInfo.ShowInfo(self)
+	}
+}
+
+func (self *Player) HandleTakeOffWeapon() {
+	for {
+		fmt.Println("输入操作的目标英雄Id:,0返回")
+		var roleId int
+		fmt.Scan(&roleId)
+
+		if roleId == 0 {
+			return
+		}
+
+		RoleInfo := self.ModRole.RoleInfo[roleId]
+		if RoleInfo == nil {
+			fmt.Println("英雄不存在")
+			continue
+		}
+
+		RoleInfo.ShowInfo(self)
+		fmt.Println("输入需要卸下的武器key:,0返回")
+		var weaponKey int
+		fmt.Scan(&weaponKey)
+		if weaponKey == 0 {
+			return
+		}
+		weapon := self.ModWeapon.WeaponInfo[weaponKey]
+		if weapon == nil {
+			fmt.Println("武器不存在")
+			continue
+		}
+		self.ModRole.TakeOffWeapon(RoleInfo, weapon, self)
+		RoleInfo.ShowInfo(self)
 	}
 }
