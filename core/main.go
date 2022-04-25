@@ -1,10 +1,7 @@
 package main
 
 import (
-	"gensin-server/csvs"
 	"gensin-server/game"
-	"math/rand"
-	"time"
 )
 
 func main() {
@@ -53,25 +50,8 @@ func main() {
 	// 3  精炼
 	// 4  穿和卸下
 	// 5  替换
-	// 加载配置
-	rand.Seed(time.Now().Unix())
-	csvs.CheckLoadCsv()
-	go game.GetManageBanWord().Run()
 
-	//fmt.Printf("数据测试 ----start\n")
-	playerTest := game.NewTestPlayer()
-	go playerTest.Run()
+	game.GetServer().Start()
 
-	for {
-
-	}
-	// ticker := time.NewTicker(time.Second * 10)
-	// for {
-	// 	select {
-	// 	case <-ticker.C:
-	// 		playerTest := game.NewTestPlayer()
-	// 		go playerTest.Run()
-	// 	}
-	// }
 	return
 }

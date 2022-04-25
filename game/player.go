@@ -108,12 +108,12 @@ func (self *Player) SetEventState(state int) {
 }
 
 func (self *Player) Run() {
-	fmt.Println("从0开始写原神服务器------测试工具v0.1")
+	fmt.Println("从0开始写原神服务器------测试工具v0.7")
 	fmt.Println("作者:B站------golang大海葵")
 	fmt.Println("模拟用户创建成功OK------开始测试")
 	fmt.Println("↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓")
 	for {
-		fmt.Println(self.ModPlayer.Name, ",欢迎来到提瓦特大陆,请选择功能：1基础信息2背包3角色(八重神子UP池)4地图5圣遗物6角色7武器")
+		fmt.Println(self.ModPlayer.Name, ",欢迎来到提瓦特大陆,请选择功能：1基础信息2背包3角色(八重神子UP池)4地图5圣遗物6角色7武器8关闭服务器")
 		var modChoose int
 		fmt.Scan(&modChoose)
 		switch modChoose {
@@ -131,6 +131,8 @@ func (self *Player) Run() {
 			self.HandleRole()
 		case 7:
 			self.HandleWeapon()
+		case 8:
+			GetServer().Close()
 		}
 	}
 }
