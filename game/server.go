@@ -1,8 +1,10 @@
 package game
 
 import (
+	"encoding/json"
 	"fmt"
 	"gensin-server/csvs"
+	"io/ioutil"
 	"math/rand"
 	"os"
 	"os/signal"
@@ -12,10 +14,25 @@ import (
 	"time"
 )
 
+type DBConfig struct {
+	DBUser     string `json:"dbuser" `
+	DBPassword string `json:"dbpassword" `
+}
+
+type ServerConfig struct {
+	ServerId      int       `json:"serverid" `
+	Host          string    `json:"host" `
+	LocalSavePath string    `json:"localsavepath"` //! 本地存储路径
+	DBConfig      *DBConfig `json:"database" `
+	HttpHost      string    `json:"httphost" `
+}
+
 type Server struct {
 	Wait        sync.WaitGroup
-	BanWordBase []string
+	BanWordBase []string //配置生成
 	Lock        *sync.RWMutex
+
+	Config *ServerConfig
 }
 
 var server *Server
@@ -30,6 +47,8 @@ func GetServer() *Server {
 
 func (self *Server) Start() {
 	//**********************************************************
+	//读取全局配置
+	self.LoadConfig()
 	// 加载配置
 	rand.Seed(time.Now().Unix())
 	csvs.CheckLoadCsv()
@@ -87,4 +106,18 @@ func (self *Server) SignalHandle() {
 			self.Close()
 		}
 	}
+}
+
+func (self *Server) LoadConfig() {
+	configFile, err := ioutil.ReadFile("./config.json")
+	if err != nil {
+		fmt.Println("error")
+		return
+	}
+	err = json.Unmarshal(configFile, &self.Config)
+	if err != nil {
+		fmt.Println("error")
+		return
+	}
+	return
 }
