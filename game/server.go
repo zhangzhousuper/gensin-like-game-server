@@ -109,7 +109,7 @@ func (self *Server) SignalHandle() {
 }
 
 func (self *Server) LoadConfig() {
-	configFile, err := ioutil.ReadFile("./config.json")
+	configFile, err := ioutil.ReadFile("D:/code/go/src/gensin-server/config.json")
 	if err != nil {
 		fmt.Println("error")
 		return

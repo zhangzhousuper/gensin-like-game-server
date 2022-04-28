@@ -1,8 +1,11 @@
 package game
 
 import (
+	"encoding/json"
 	"fmt"
 	"gensin-server/csvs"
+	"io/ioutil"
+	"os"
 	"time"
 )
 
@@ -256,4 +259,19 @@ func (self *ModPlayer) GetWorldLevelNow() int {
 
 func (self *ModPlayer) RelicsUp(player *Player) {
 	player.ModRelics.RelicsUp(player)
+}
+
+func (self *ModPlayer) SaveData(path string) {
+	self.ShowCard = append(self.ShowCard, 1)
+	self.ShowCard = append(self.ShowCard, 2)
+	self.ShowCard = append(self.ShowCard, 3)
+	self.ShowCard = append(self.ShowCard, 4)
+	content, err := json.Marshal(self)
+	if err != nil {
+		return
+	}
+	err = ioutil.WriteFile(path, content, os.ModePerm)
+	if err != nil {
+		return
+	}
 }

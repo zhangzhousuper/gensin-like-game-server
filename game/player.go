@@ -3,6 +3,7 @@ package game
 import (
 	"fmt"
 	"gensin-server/csvs"
+	"os"
 )
 
 const (
@@ -58,7 +59,29 @@ func NewTestPlayer() *Player {
 	player.ModPlayer.WorldLevel = 1
 	player.ModPlayer.WorldLevelNow = 1
 	//****************************************
+	player.ModPlayer.UserId = 10000666
+	player.InitData()
 	return player
+}
+
+func (self *Player) InitData() {
+	path := GetServer().Config.LocalSavePath
+	_, err := os.Stat(path)
+	if err != nil {
+		err = os.Mkdir(path, os.ModePerm)
+		if err != nil {
+			return
+		}
+	}
+	selfPath := path + fmt.Sprintf("/%d", self.ModPlayer.UserId)
+	_, err = os.Stat(selfPath)
+	if err != nil {
+		err = os.Mkdir(selfPath, os.ModePerm)
+		if err != nil {
+			return
+		}
+		self.ModPlayer.SaveData(selfPath + "/player.json")
+	}
 }
 
 // 对外接口
