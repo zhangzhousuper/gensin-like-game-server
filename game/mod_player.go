@@ -275,3 +275,17 @@ func (self *ModPlayer) SaveData(path string) {
 		return
 	}
 }
+
+func (self *ModPlayer) LoadData(path string) {
+	configFile, err := ioutil.ReadFile(path)
+	if err != nil {
+		fmt.Println("error")
+		return
+	}
+	err = json.Unmarshal(configFile, &self)
+	if err != nil {
+		fmt.Println("error")
+		return
+	}
+	return
+}
