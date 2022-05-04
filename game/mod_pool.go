@@ -1,8 +1,11 @@
 package game
 
 import (
+	"encoding/json"
 	"fmt"
 	"gensin-server/csvs"
+	"io/ioutil"
+	"os"
 )
 
 type PoolInfo struct {
@@ -14,6 +17,9 @@ type PoolInfo struct {
 
 type ModPool struct {
 	UpPoolInfo *PoolInfo
+
+	player *Player
+	path   string
 }
 
 func (self *ModPool) AddTimes() {
@@ -92,6 +98,13 @@ func (self *ModPool) DoUpPool() {
 						self.UpPoolInfo.IsMustUp = csvs.LOGIC_TRUE
 					}
 				} else if roleConfig.Star == 4 {
+					self.UpPoolInfo.FourStarTimes = 0
+					fourNum++
+				}
+			}
+			weaponConfig := csvs.GetWeaponConfig(roleIdConfig.Result)
+			if weaponConfig != nil {
+				if weaponConfig.Star == 4 {
 					self.UpPoolInfo.FourStarTimes = 0
 					fourNum++
 				}
@@ -181,7 +194,7 @@ func (self *ModPool) HandleUpPoolTen(player *Player) {
 				}
 			}
 			// fmt.Println(fmt.Sprintf("第%d抽抽中:%s", i+1, csvs.GetItemName(roleIdConfig.Result)))
-			player.ModBag.AddItem(roleIdConfig.Result, 1, player)
+			player.GetModBag().AddItem(roleIdConfig.Result, 1)
 		}
 	}
 	if self.UpPoolInfo.IsMustUp == csvs.LOGIC_FALSE {
@@ -267,8 +280,15 @@ func (self *ModPool) HandleUpPoolSingle(times int, player *Player) {
 					fourNum++
 				}
 			}
+			weaponConfig := csvs.GetWeaponConfig(roleIdConfig.Result)
+			if weaponConfig != nil {
+				if weaponConfig.Star == 4 {
+					self.UpPoolInfo.FourStarTimes = 0
+					fourNum++
+				}
+			}
 			result[roleIdConfig.Result]++
-			player.ModBag.AddItem(roleIdConfig.Result, 1, player)
+			player.GetModBag().AddItem(roleIdConfig.Result, 1)
 		}
 	}
 
@@ -489,7 +509,7 @@ func (self *ModPool) HandleUpPoolSingleCheck1(times int, player *Player) {
 			dropGroup = newDropGroup
 		}
 
-		fiveInfo, fourInfo := player.ModRole.GetRoleInfoForPoolCheck()
+		fiveInfo, fourInfo := player.GetModRole().GetRoleInfoForPoolCheck()
 		roleIdConfig := csvs.GetRandDropNew1(dropGroup, fiveInfo, fourInfo)
 
 		if roleIdConfig != nil {
@@ -518,8 +538,15 @@ func (self *ModPool) HandleUpPoolSingleCheck1(times int, player *Player) {
 					fourNum++
 				}
 			}
+			weaponConfig := csvs.GetWeaponConfig(roleIdConfig.Result)
+			if weaponConfig != nil {
+				if weaponConfig.Star == 4 {
+					self.UpPoolInfo.FourStarTimes = 0
+					fourNum++
+				}
+			}
 			result[roleIdConfig.Result]++
-			player.ModBag.AddItem(roleIdConfig.Result, 1, player)
+			player.GetModBag().AddItem(roleIdConfig.Result, 1)
 		}
 	}
 
@@ -576,7 +603,7 @@ func (self *ModPool) HandleUpPoolSingleCheck2(times int, player *Player) {
 			}
 			dropGroup = newDropGroup
 		}
-		fiveInfo, fourInfo := player.ModRole.GetRoleInfoForPoolCheck()
+		fiveInfo, fourInfo := player.GetModRole().GetRoleInfoForPoolCheck()
 		roleIdConfig := csvs.GetRandDropNew2(dropGroup, fiveInfo, fourInfo)
 		if roleIdConfig != nil {
 			roleConfig := csvs.GetRoleConfig(roleIdConfig.Result)
@@ -604,8 +631,15 @@ func (self *ModPool) HandleUpPoolSingleCheck2(times int, player *Player) {
 					fourNum++
 				}
 			}
+			weaponConfig := csvs.GetWeaponConfig(roleIdConfig.Result)
+			if weaponConfig != nil {
+				if weaponConfig.Star == 4 {
+					self.UpPoolInfo.FourStarTimes = 0
+					fourNum++
+				}
+			}
 			result[roleIdConfig.Result]++
-			player.ModBag.AddItem(roleIdConfig.Result, 1, player)
+			player.GetModBag().AddItem(roleIdConfig.Result, 1)
 		}
 	}
 
@@ -614,4 +648,41 @@ func (self *ModPool) HandleUpPoolSingleCheck2(times int, player *Player) {
 	}
 	fmt.Println(fmt.Sprintf("抽中4星：%d", fourNum))
 	fmt.Println(fmt.Sprintf("抽中5星：%d", fiveNum))
+}
+
+func (self *ModPool) SaveData() {
+	content, err := json.Marshal(self)
+	if err != nil {
+		return
+	}
+	err = ioutil.WriteFile(self.path, content, os.ModePerm)
+	if err != nil {
+		return
+	}
+}
+
+func (self *ModPool) LoadData(player *Player) {
+
+	self.player = player
+	self.path = self.player.localPath + "/pool.json"
+
+	configFile, err := ioutil.ReadFile(self.path)
+	if err != nil {
+		fmt.Println("error")
+		return
+	}
+	err = json.Unmarshal(configFile, &self)
+	if err != nil {
+		self.InitData()
+		return
+	}
+
+	if self.UpPoolInfo == nil {
+		self.UpPoolInfo = new(PoolInfo)
+	}
+	return
+}
+
+func (self *ModPool) InitData() {
+
 }

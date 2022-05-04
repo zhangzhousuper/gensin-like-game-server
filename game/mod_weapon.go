@@ -1,8 +1,11 @@
 package game
 
 import (
+	"encoding/json"
 	"fmt"
 	"gensin-server/csvs"
+	"io/ioutil"
+	"os"
 )
 
 type Weapon struct {
@@ -18,6 +21,9 @@ type Weapon struct {
 type ModWeapon struct {
 	WeaponInfo map[int]*Weapon
 	MaxKey     int
+
+	player *Player
+	path   string
 }
 
 func (self *ModWeapon) AddItem(itemId int, num int64) {
@@ -102,7 +108,7 @@ func (self *ModWeapon) WeaponUpStar(keyId int, player *Player) {
 	weapon.ShowInfo()
 }
 
-func (self *ModWeapon) WeaponUpRefine(keyId int, targetKeyId int, plyaer *Player) {
+func (self *ModWeapon) WeaponUpRefine(keyId int, targetKeyId int, player *Player) {
 	if keyId == targetKeyId {
 		fmt.Println("错误的材料")
 		return
@@ -126,4 +132,41 @@ func (self *ModWeapon) WeaponUpRefine(keyId int, targetKeyId int, plyaer *Player
 	weapon.RefineLevel++
 	delete(self.WeaponInfo, targetKeyId)
 	weapon.ShowInfo()
+}
+
+func (self *ModWeapon) SaveData() {
+	content, err := json.Marshal(self)
+	if err != nil {
+		return
+	}
+	err = ioutil.WriteFile(self.path, content, os.ModePerm)
+	if err != nil {
+		return
+	}
+}
+
+func (self *ModWeapon) LoadData(player *Player) {
+
+	self.player = player
+	self.path = self.player.localPath + "/weapon.json"
+
+	configFile, err := ioutil.ReadFile(self.path)
+	if err != nil {
+		fmt.Println("error")
+		return
+	}
+	err = json.Unmarshal(configFile, &self)
+	if err != nil {
+		self.InitData()
+		return
+	}
+
+	if self.WeaponInfo == nil {
+		self.WeaponInfo = make(map[int]*Weapon)
+	}
+	return
+}
+
+func (self *ModWeapon) InitData() {
+
 }

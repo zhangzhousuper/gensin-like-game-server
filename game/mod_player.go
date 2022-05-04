@@ -14,64 +14,68 @@ type ShowRole struct {
 	RoleLevel int
 }
 type ModPlayer struct {
-	UserId         int
-	Icon           int
-	Card           int
-	Name           string
-	Sign           string
-	Level          int
-	PlayerLevel    int //内部接口
-	PlayerExp      int
-	WorldLevel     int
-	WorldLevelNow  int
-	WorldLevelCool int64
-	Birth          int
-	ShowTeam       []*ShowRole
-	HideShowTeam   int
-	ShowCard       []int
+	UserId         int         `json:"userid" ` //唯一id
+	Icon           int         //头像   新增icon模块
+	Card           int         //名片   新增card模块
+	Name           string      //名字   新增banword模块
+	Sign           string      //签名
+	PlayerLevel    int         //等级
+	PlayerExp      int         //阅历(经验)
+	WorldLevel     int         //大世界等级
+	WorldLevelNow  int         //大世界等级(当前)
+	WorldLevelCool int64       //操作大世界等级的冷却时间
+	Birth          int         //生日
+	ShowTeam       []*ShowRole //展示阵容
+	HideShowTeam   int         //隐藏开关
+	ShowCard       []int       //展示名片
 	//看不见的字段
-	IsProhibit int //int > bool 方便扩展
-	IsGM       int
-} // 对于数据库某一张表
+	Prohibit int //封禁状态
+	IsGM     int //GM账号标志
+
+	player *Player
+	path   string
+}
 
 // shift + alt + f  vscode格式化
 
-func (self *ModPlayer) SetIcon(iconId int, player *Player) {
-
-	if !player.ModIcon.IsHasIcon(iconId) {
-		// 通知客户端， 操作非法
+func (self *ModPlayer) SetIcon(iconId int) {
+	if !self.player.GetModIcon().IsHasIcon(iconId) {
+		//通知客户端，操作非法
+		fmt.Println("没有头像:", iconId)
 		return
 	}
-	player.ModPlayer.Icon = iconId
-	fmt.Println("当前图标:", player.ModPlayer.Icon)
+
+	self.Icon = iconId
+	fmt.Println("变更头像为:", csvs.GetItemName(iconId), self.Icon)
 }
 
-func (self *ModPlayer) SetCard(cardId int, player *Player) {
-
-	if !player.ModCard.IsHasCard(cardId) {
-		// 通知客户端， 操作非法
+func (self *ModPlayer) SetCard(cardId int) {
+	if !self.player.GetModCard().IsHasCard(cardId) {
+		//通知客户端，操作非法
 		return
 	}
-	player.ModPlayer.Card = cardId
-	fmt.Println("当前名片:", player.ModPlayer.Card)
+
+	self.Card = cardId
+	fmt.Println("当前名片", self.Card)
 }
 
-func (self *ModPlayer) SetName(name string, player *Player) {
-	// 调用一个HTTP地址接口判断违禁字(不好)
+func (self *ModPlayer) SetName(name string) {
+
 	if GetManageBanWord().IsBanWord(name) {
 		return
 	}
 
-	player.ModPlayer.Name = name
-	fmt.Println("当前名字:", player.ModPlayer.Name)
+	self.Name = name
+	//fmt.Println("设置成功,名字变更为:", player.ModPlayer.Name)
 }
 
-func (self *ModPlayer) SetSign(sign string, player *Player) {
+func (self *ModPlayer) SetSign(sign string) {
 	if GetManageBanWord().IsBanWord(sign) {
 		return
 	}
-	player.ModPlayer.Sign = sign
-	fmt.Println("当前签名:", player.ModPlayer.Sign)
+
+	self.Sign = sign
+	fmt.Println("设置成功,签名变更为:", self.Sign)
 }
 
 func (self *ModPlayer) AddExp(exp int, player *Player) {
@@ -85,10 +89,9 @@ func (self *ModPlayer) AddExp(exp int, player *Player) {
 			break
 		}
 		//是否完成任务
-		if config.ChapterId > 0 && !player.ModUniqueTask.IsTaskFinish(config.ChapterId) {
+		if config.ChapterId > 0 && !player.GetModUniqueTask().IsTaskFinish(config.ChapterId) {
 			break
 		}
-
 		if self.PlayerExp >= config.PlayerExp {
 			self.PlayerLevel += 1
 			self.PlayerExp -= config.PlayerExp
@@ -198,7 +201,7 @@ func (self *ModPlayer) SetShowCard(showCard []int, player *Player) {
 		if ok {
 			continue
 		}
-		if !player.ModCard.IsHasCard(cardId) {
+		if !player.GetModCard().IsHasCard(cardId) {
 			continue
 		}
 		newList = append(newList, cardId)
@@ -213,6 +216,7 @@ func (self *ModPlayer) SetShowTeam(showRole []int, player *Player) {
 		fmt.Println("消息结构错误")
 		return
 	}
+
 	roleExist := make(map[int]int)
 	newList := make([]*ShowRole, 0)
 	for _, roleId := range showRole {
@@ -220,17 +224,17 @@ func (self *ModPlayer) SetShowTeam(showRole []int, player *Player) {
 		if ok {
 			continue
 		}
-		if !player.ModRole.IsHasRole(roleId) {
+		if !player.GetModRole().IsHasRole(roleId) {
 			continue
 		}
 		showRole := new(ShowRole)
 		showRole.RoleId = roleId
-		showRole.RoleLevel = player.ModRole.GetRoleLevel(roleId)
+		showRole.RoleLevel = player.GetModRole().GetRoleLevel(roleId)
 		newList = append(newList, showRole)
 		roleExist[roleId] = 1
 	}
 	self.ShowTeam = newList
-	fmt.Println(self.ShowTeam)
+	fmt.Println(self.ShowCard)
 }
 
 func (self *ModPlayer) SetHideShowTeam(isHide int, player *Player) {
@@ -242,7 +246,7 @@ func (self *ModPlayer) SetHideShowTeam(isHide int, player *Player) {
 }
 
 func (self *ModPlayer) SetProhibit(prohibit int) {
-	self.IsProhibit = prohibit
+	self.Prohibit = prohibit
 }
 
 func (self *ModPlayer) SetIsGM(isGM int) {
@@ -250,7 +254,7 @@ func (self *ModPlayer) SetIsGM(isGM int) {
 }
 
 func (self *ModPlayer) IsCanEnter() bool {
-	return int64(self.IsProhibit) < time.Now().Unix()
+	return int64(self.Prohibit) < time.Now().Unix()
 }
 
 func (self *ModPlayer) GetWorldLevelNow() int {
@@ -258,10 +262,10 @@ func (self *ModPlayer) GetWorldLevelNow() int {
 }
 
 func (self *ModPlayer) RelicsUp(player *Player) {
-	player.ModRelics.RelicsUp(player)
+	player.GetModRelics().RelicsUp(player)
 }
 
-func (self *ModPlayer) SaveData(path string) {
+func (self *ModPlayer) SaveData() {
 	self.ShowCard = append(self.ShowCard, 1)
 	self.ShowCard = append(self.ShowCard, 2)
 	self.ShowCard = append(self.ShowCard, 3)
@@ -270,22 +274,33 @@ func (self *ModPlayer) SaveData(path string) {
 	if err != nil {
 		return
 	}
-	err = ioutil.WriteFile(path, content, os.ModePerm)
+	err = ioutil.WriteFile(self.path, content, os.ModePerm)
 	if err != nil {
 		return
 	}
 }
 
-func (self *ModPlayer) LoadData(path string) {
-	configFile, err := ioutil.ReadFile(path)
+func (self *ModPlayer) LoadData(player *Player) {
+
+	self.player = player
+	self.path = self.player.localPath + "/player.json"
+
+	configFile, err := ioutil.ReadFile(self.path)
 	if err != nil {
 		fmt.Println("error")
 		return
 	}
 	err = json.Unmarshal(configFile, &self)
 	if err != nil {
-		fmt.Println("error")
+		self.InitData()
 		return
 	}
 	return
+}
+
+func (self *ModPlayer) InitData() {
+	self.PlayerLevel = 1
+	self.Name = "旅行者"
+	self.WorldLevel = 1
+	self.WorldLevelNow = 1
 }

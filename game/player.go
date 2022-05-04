@@ -12,55 +12,56 @@ const (
 	TASK_STATE_FINISH = 2
 )
 
-type Player struct {
-	ModPlayer     *ModPlayer
-	ModIcon       *ModIcon
-	ModCard       *ModCard
-	ModUniqueTask *ModUniqueTask
-	ModRole       *ModRole
-	ModBag        *ModBag
-	ModWeapon     *ModWeapon
-	ModRelics     *ModRelics
-	ModCook       *ModCook
-	ModHome       *ModHome
-	ModPool       *ModPool
-	ModMap        *ModMap
+const (
+	MOD_PLAYER     = "player"
+	MOD_ICON       = "icon"
+	MOD_CARD       = "card"
+	MOD_UNIQUETASK = "uniquetask"
+	MOD_ROLE       = "role"
+	MOD_BAG        = "bag"
+	MOD_WEAPON     = "weapon "
+	MOD_RELICS     = "relics"
+	MOD_COOK       = "cook"
+	MOD_HOME       = "home"
+	MOD_POOL       = "pool"
+	MOD_MAP        = "map"
+)
+
+type ModBase interface {
+	LoadData(player *Player)
+	SaveData()
+	InitData()
 }
 
-func NewTestPlayer() *Player {
-	player := new(Player)
-	player.ModPlayer = new(ModPlayer)
-	player.ModIcon = new(ModIcon)
-	player.ModIcon.IconInfo = make(map[int]*Icon)
-	player.ModCard = new(ModCard)
-	player.ModCard.CardInfo = make(map[int]*Card)
-	player.ModUniqueTask = new(ModUniqueTask)
-	player.ModUniqueTask.MyTaskInfo = make(map[int]*TaskInfo)
-	//player.ModUniqueTask.Locker = new(sync.RWMutex)
-	player.ModRole = new(ModRole)
-	player.ModRole.RoleInfo = make(map[int]*RoleInfo)
-	player.ModBag = new(ModBag)
-	player.ModBag.BagInfo = make(map[int]*ItemInfo)
-	player.ModWeapon = new(ModWeapon)
-	player.ModWeapon.WeaponInfo = make(map[int]*Weapon)
-	player.ModRelics = new(ModRelics)
-	player.ModRelics.RelicsInfo = make(map[int]*Relics)
-	player.ModCook = new(ModCook)
-	player.ModCook.CookInfo = make(map[int]*Cook)
-	player.ModHome = new(ModHome)
-	player.ModHome.HomeItemIdInfo = make(map[int]*HomeItemId)
-	player.ModPool = new(ModPool)
-	player.ModPool.UpPoolInfo = new(PoolInfo)
-	player.ModMap = new(ModMap)
-	player.ModMap.InitData()
-	//****************************************
-	player.ModPlayer.PlayerLevel = 1
-	player.ModPlayer.Name = "旅行者"
-	player.ModPlayer.WorldLevel = 1
-	player.ModPlayer.WorldLevelNow = 1
-	//****************************************
-	player.ModPlayer.UserId = 10000666
+type Player struct {
+	UserId       int64
+	modManage    map[string]ModBase
+	localPath    string
+	channelLogic chan []byte
+}
+
+var player *Player
+
+func NewTestPlayer(userid int64) *Player {
+	player = new(Player)
+	player.UserId = userid
+	player.channelLogic = make(chan []byte)
+	player.modManage = map[string]ModBase{
+		MOD_PLAYER:     new(ModPlayer),
+		MOD_ICON:       new(ModIcon),
+		MOD_CARD:       new(ModCard),
+		MOD_UNIQUETASK: new(ModUniqueTask),
+		MOD_ROLE:       new(ModRole),
+		MOD_BAG:        new(ModBag),
+		MOD_WEAPON:     new(ModWeapon),
+		MOD_RELICS:     new(ModRelics),
+		MOD_COOK:       new(ModCook),
+		MOD_HOME:       new(ModHome),
+		MOD_POOL:       new(ModPool),
+		MOD_MAP:        new(ModMap),
+	}
 	player.InitData()
+	player.InitMod()
 	return player
 }
 
@@ -73,57 +74,61 @@ func (self *Player) InitData() {
 			return
 		}
 	}
-	selfPath := path + fmt.Sprintf("/%d", self.ModPlayer.UserId)
-	_, err = os.Stat(selfPath)
+	self.localPath = path + fmt.Sprintf("/%d", self.UserId)
+	_, err = os.Stat(self.localPath)
 	if err != nil {
-		err = os.Mkdir(selfPath, os.ModePerm)
+		err = os.Mkdir(self.localPath, os.ModePerm)
 		if err != nil {
 			return
 		}
-		self.ModPlayer.SaveData(selfPath + "/player.json")
 	}
 }
 
-// 对外接口
+func (self *Player) InitMod() {
+	for _, v := range self.modManage {
+		v.LoadData(self)
+	}
+}
+
+//对外接口
 func (self *Player) RecvSetIcon(iconId int) {
-	//Recv* 与客户端打交道的函数
-	self.ModPlayer.SetIcon(iconId, self)
+	self.GetMod(MOD_PLAYER).(*ModPlayer).SetIcon(iconId)
 }
 
 func (self *Player) RecvSetCard(cardId int) {
-	self.ModPlayer.SetCard(cardId, self)
+	self.GetMod(MOD_PLAYER).(*ModPlayer).SetCard(cardId)
 }
 
 func (self *Player) RecvSetName(name string) {
-	self.ModPlayer.SetName(name, self)
+	self.GetMod(MOD_PLAYER).(*ModPlayer).SetName(name)
 }
 
 func (self *Player) RecvSetSign(sign string) {
-	self.ModPlayer.SetSign(sign, self)
+	self.GetMod(MOD_PLAYER).(*ModPlayer).SetSign(sign)
 }
 
 func (self *Player) ReduceWorldLevel() {
-	self.ModPlayer.ReduceWorldLevel(self)
+	self.GetMod(MOD_PLAYER).(*ModPlayer).ReduceWorldLevel()
 }
 
 func (self *Player) ReturnWorldLevel() {
-	self.ModPlayer.ReturnWorldLevel(self)
+	self.GetMod(MOD_PLAYER).(*ModPlayer).ReturnWorldLevel()
 }
 
 func (self *Player) SetBirth(birth int) {
-	self.ModPlayer.SetBirth(birth, self)
+	self.GetMod(MOD_PLAYER).(*ModPlayer).SetBirth(birth)
 }
 
-func (self *Player) SetShowCard(ShowCard []int) {
-	self.ModPlayer.SetShowCard(ShowCard, self)
+func (self *Player) SetShowCard(showCard []int) {
+	self.GetMod(MOD_PLAYER).(*ModPlayer).SetShowCard(showCard, self)
 }
 
-func (self *Player) SetShowTeam(ShowRole []int) {
-	self.ModPlayer.SetShowTeam(ShowRole, self)
+func (self *Player) SetShowTeam(showRole []int) {
+	self.GetMod(MOD_PLAYER).(*ModPlayer).SetShowTeam(showRole, self)
 }
 
 func (self *Player) SetHideShowTeam(isHide int) {
-	self.ModPlayer.SetHideShowTeam(isHide, self)
+	self.GetMod(MOD_PLAYER).(*ModPlayer).SetHideShowTeam(isHide, self)
 }
 
 func (self *Player) SetEventState(state int) {
@@ -701,4 +706,56 @@ func (self *Player) HandleTakeOffWeapon() {
 		self.ModRole.TakeOffWeapon(RoleInfo, weapon, self)
 		RoleInfo.ShowInfo(self)
 	}
+}
+
+func (self *Player) GetMod(modName string) ModBase {
+	return self.modManage[modName]
+}
+
+func (self *Player) GetModPlayer() *ModPlayer {
+	return self.modManage[MOD_PLAYER].(*ModPlayer)
+}
+
+func (self *Player) GetModIcon() *ModIcon {
+	return self.modManage[MOD_ICON].(*ModIcon)
+}
+
+func (self *Player) GetModCard() *ModCard {
+	return self.modManage[MOD_CARD].(*ModCard)
+}
+
+func (self *Player) GetModUniqueTask() *ModUniqueTask {
+	return self.modManage[MOD_UNIQUETASK].(*ModUniqueTask)
+}
+
+func (self *Player) GetModRole() *ModRole {
+	return self.modManage[MOD_ROLE].(*ModRole)
+}
+
+func (self *Player) GetModBag() *ModBag {
+	return self.modManage[MOD_BAG].(*ModBag)
+}
+
+func (self *Player) GetModWeapon() *ModWeapon {
+	return self.modManage[MOD_WEAPON].(*ModWeapon)
+}
+
+func (self *Player) GetModRelics() *ModRelics {
+	return self.modManage[MOD_RELICS].(*ModRelics)
+}
+
+func (self *Player) GetModCook() *ModCook {
+	return self.modManage[MOD_COOK].(*ModCook)
+}
+
+func (self *Player) GetModHome() *ModHome {
+	return self.modManage[MOD_HOME].(*ModHome)
+}
+
+func (self *Player) GetModPool() *ModPool {
+	return self.modManage[MOD_POOL].(*ModPool)
+}
+
+func (self *Player) GetModMap() *ModMap {
+	return self.modManage[MOD_MAP].(*ModMap)
 }
