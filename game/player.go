@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"gensin-server/csvs"
 	"os"
+
+	"golang.org/x/net/websocket"
 )
 
 const (
@@ -37,11 +39,14 @@ type Player struct {
 	UserId    int64
 	modManage map[string]ModBase
 	localPath string
+	ws        *websocket.Conn
 }
+
+var player *Player
 
 func NewTestPlayer(userid int64) *Player {
 	// 泛型架构
-	player := new(Player)
+	player = new(Player)
 	player.UserId = userid
 	player.modManage = map[string]ModBase{
 		MOD_PLAYER:     new(ModPlayer),
