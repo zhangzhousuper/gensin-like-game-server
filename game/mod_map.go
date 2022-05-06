@@ -299,11 +299,11 @@ func (self *ModMap) UpStatue(statueId int) {
 			return
 		}
 		info.ItemInfo[nextConfig.CostItem].ItemNum += num
-		player.GetModBag().RemoveItemFromBag(nextConfig.CostItem, num)
+		self.player.GetModBag().RemoveItemFromBag(nextConfig.CostItem, num)
 		fmt.Println(fmt.Sprintf("神像升级,提交物品%d，数量%d，当前数量%d", nextConfig.CostItem, num, info.ItemInfo[nextConfig.CostItem].ItemNum))
 
 	} else {
-		player.GetModBag().RemoveItemFromBag(nextConfig.CostItem, needNum)
+		self.player.GetModBag().RemoveItemFromBag(nextConfig.CostItem, needNum)
 		info.Level++
 		info.ItemInfo = make(map[int]*ItemInfo)
 		fmt.Println(fmt.Sprintf("神像升级成功,神像:%d，当前等级:%d", info.StatueId, info.Level))

@@ -102,66 +102,68 @@ func (self *ModPlayer) AddExp(exp int, player *Player) {
 	fmt.Println("当前等级:", self.PlayerLevel, "---当前经验：", self.PlayerExp)
 }
 
-func (self *ModPlayer) ReduceWorldLevel(player *Player) {
+func (self *ModPlayer) ReduceWorldLevel() {
 	if self.WorldLevel < csvs.REDUCE_WORLD_LEVEL_START {
-		fmt.Println("操作失败， ---当前世界等级", self.WorldLevel)
+		fmt.Println("操作失败:, ---当前世界等级：", self.WorldLevel)
 		return
 	}
 
 	if self.WorldLevel-self.WorldLevelNow >= csvs.REDUCE_WORLD_LEVEL_MAX {
-		fmt.Println("操作失败 ---当前世界等级", self.WorldLevel, "---真实世界等级", self.WorldLevelNow)
+		fmt.Println("操作失败:, ---当前世界等级：", self.WorldLevel, "---真实世界等级：", self.WorldLevelNow)
+		return
 	}
 
-	if time.Now().Unix() < int64(self.WorldLevelCool) {
-		fmt.Println("操作失败，---冷却中")
+	if time.Now().Unix() < self.WorldLevelCool {
+		fmt.Println("操作失败:, ---冷却中")
 		return
 	}
 
 	self.WorldLevelNow -= 1
 	self.WorldLevelCool = time.Now().Unix() + csvs.REDUCE_WORLD_LEVEL_COOL_TIME
-	fmt.Println("操作成功 ---当前世界等级", self.WorldLevel, "---真实世界等级", self.WorldLevelNow)
+	fmt.Println("操作成功:, ---当前世界等级：", self.WorldLevel, "---真实世界等级：", self.WorldLevelNow)
 	return
 }
 
-func (self *ModPlayer) ReturnWorldLevel(player *Player) {
+func (self *ModPlayer) ReturnWorldLevel() {
 	if self.WorldLevelNow == self.WorldLevel {
-		fmt.Println("操作失败 ---当前世界等级", self.WorldLevel, "---真实世界等级", self.WorldLevelNow)
+		fmt.Println("操作失败:, ---当前世界等级：", self.WorldLevel, "---真实世界等级：", self.WorldLevelNow)
 		return
 	}
 
 	if time.Now().Unix() < self.WorldLevelCool {
-		fmt.Println("操作失败，---冷却中")
+		fmt.Println("操作失败:, ---冷却中")
 		return
 	}
 
 	self.WorldLevelNow += 1
 	self.WorldLevelCool = time.Now().Unix() + csvs.REDUCE_WORLD_LEVEL_COOL_TIME
-	fmt.Println("操作成功 ---当前世界等级", self.WorldLevel, "---真实世界等级", self.WorldLevelNow)
+	fmt.Println("操作成功:, ---当前世界等级：", self.WorldLevel, "---真实世界等级：", self.WorldLevelNow)
 	return
 }
 
-func (self *ModPlayer) SetBirth(birth int, player *Player) {
+func (self *ModPlayer) SetBirth(birth int) {
 	if self.Birth > 0 {
-		fmt.Println("已设置过生日！")
+		fmt.Println("已设置过生日!")
 		return
 	}
 
 	month := birth / 100
 	day := birth % 100
+
 	switch month {
 	case 1, 3, 5, 7, 8, 10, 12:
 		if day <= 0 || day > 31 {
-			fmt.Println(month, "月没有", day, "日")
+			fmt.Println(month, "月没有", day, "日！")
 			return
 		}
 	case 4, 6, 9, 11:
 		if day <= 0 || day > 30 {
-			fmt.Println(month, "月没有", day, "日")
+			fmt.Println(month, "月没有", day, "日！")
 			return
 		}
 	case 2:
 		if day <= 0 || day > 29 {
-			fmt.Println(month, "月没有", day, "日")
+			fmt.Println(month, "月没有", day, "日！")
 			return
 		}
 	default:
@@ -170,13 +172,14 @@ func (self *ModPlayer) SetBirth(birth int, player *Player) {
 	}
 
 	self.Birth = birth
-	fmt.Println("设置成功，生日为", month, "月", day, "日")
+	fmt.Println("设置成功，生日为:", month, "月", day, "日")
 
 	if self.IsBirthDay() {
 		fmt.Println("今天是你的生日，生日快乐！")
 	} else {
-		fmt.Println("期待你的生日到来")
+		fmt.Println("期待你生日的到来!")
 	}
+
 }
 
 func (self *ModPlayer) IsBirthDay() bool {
