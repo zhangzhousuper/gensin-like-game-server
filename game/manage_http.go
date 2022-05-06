@@ -1,6 +1,7 @@
 package game
 
 import (
+	"encoding/json"
 	"fmt"
 	"net"
 
@@ -23,8 +24,8 @@ func GetManageHttp() *ManageHttp {
 }
 
 func (self *ManageHttp) InitData() {
+	println("http init")
 	http.Handle("/", websocket.Handler(self.WebsocketHandler))
-
 	http.HandleFunc("/correctname", self.CorrectName)
 }
 
@@ -37,7 +38,9 @@ func (self *ManageHttp) WebsocketHandler(ws *websocket.Conn) {
 
 	var player *Player
 
+	fmt.Println("服务器连接成功")
 	for {
+
 		var msg []byte
 
 		ws.SetReadDeadline(time.Now().Add(3 * time.Second))
@@ -48,14 +51,24 @@ func (self *ManageHttp) WebsocketHandler(ws *websocket.Conn) {
 			if ok && netErr.Timeout() {
 				continue
 			}
+			if player != nil {
+				//存档
+				GetManagePlayer().PlayerClose(ws, player.UserId)
+			}
 			break
 		}
 		fmt.Println(string(msg))
 
 		if player == nil {
-			player = NewTestPlayer(10000666)
+			var loginMsg MsgLogin
+			msgErr := json.Unmarshal(msg, &loginMsg)
+			if msgErr == nil {
+				player = GetManagePlayer().PlayerLoginIn(ws, loginMsg.UserId)
+				go player.LogicRun()
+			}
+		} else {
+			player.SendLogic(msg)
 		}
 	}
-
 	return
 }

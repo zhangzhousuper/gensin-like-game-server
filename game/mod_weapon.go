@@ -152,7 +152,7 @@ func (self *ModWeapon) LoadData(player *Player) {
 
 	configFile, err := ioutil.ReadFile(self.path)
 	if err != nil {
-		fmt.Println("error")
+		self.InitData()
 		return
 	}
 	err = json.Unmarshal(configFile, &self)
@@ -168,5 +168,7 @@ func (self *ModWeapon) LoadData(player *Player) {
 }
 
 func (self *ModWeapon) InitData() {
-
+	if self.WeaponInfo == nil {
+		self.WeaponInfo = make(map[int]*Weapon)
+	}
 }

@@ -6,6 +6,7 @@ import (
 	"gensin-server/csvs"
 	"io/ioutil"
 	"math/rand"
+	"net/http"
 	"os"
 	"os/signal"
 	"regexp"
@@ -53,11 +54,15 @@ func (self *Server) Start() {
 	rand.Seed(time.Now().Unix())
 	csvs.CheckLoadCsv()
 	go GetManageBanWord().Run()
+	go GetManageHttp().InitData()
+	go GetManagePlayer().Run()
 
 	//fmt.Printf("数据测试----start\n")
-	playerTest := NewTestPlayer(10000666)
+	playerTest := NewTestPlayer(nil, 10000666)
 	go playerTest.Run()
 	go self.SignalHandle()
+
+	http.ListenAndServe(GetServer().Config.Host, nil)
 
 	self.Wait.Wait()
 	fmt.Println("服务器关闭")

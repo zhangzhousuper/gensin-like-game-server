@@ -57,7 +57,7 @@ func (self *ManageBanWord) Run() {
 		select {
 		case <-ticker.C:
 			if time.Now().Unix()%10 == 0 {
-				fmt.Println("更新违禁词")
+				//fmt.Println("更新违禁词")
 				GetServer().UpdateBanWord(self.BanWordBase)
 			}
 		case _, ok := <-self.MsgChannel:
